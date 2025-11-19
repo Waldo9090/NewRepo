@@ -6,15 +6,17 @@ import { Loader2 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
 interface ClientCampaignBreakdownProps {
-  campaignName: string
+  campaignName?: string
+  campaignId?: string
   workspaceId: string
   dateRange: string
 }
 
-export function ClientCampaignBreakdown({ campaignName, workspaceId, dateRange }: ClientCampaignBreakdownProps) {
-  const { campaignId, loading, error } = useResolvedCampaignId(campaignName, workspaceId)
+export function ClientCampaignBreakdown({ campaignName, campaignId: directCampaignId, workspaceId, dateRange }: ClientCampaignBreakdownProps) {
+  const { campaignId: resolvedCampaignId, loading, error } = useResolvedCampaignId(campaignName || '', workspaceId)
+  const campaignId = directCampaignId || resolvedCampaignId
 
-  if (loading) {
+  if (loading && !directCampaignId) {
     return (
       <Card className="p-8 bg-white/60 backdrop-blur-sm border-slate-200 shadow-sm">
         <div className="flex items-center justify-center h-48">
@@ -27,7 +29,7 @@ export function ClientCampaignBreakdown({ campaignName, workspaceId, dateRange }
     )
   }
 
-  if (error || !campaignId) {
+  if ((error || !campaignId) && !directCampaignId) {
     return (
       <Card className="p-8 bg-white/60 backdrop-blur-sm border-slate-200 shadow-sm">
         <div className="text-center text-slate-600">

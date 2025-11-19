@@ -8,6 +8,7 @@ import { PerformanceChart } from "@/components/performance-chart"
 import { CampaignFilter } from "@/components/campaign-filter"
 import { WorkspaceFilter } from "@/components/workspace-filter"
 import { DateRangeFilter, type DateRange } from "@/components/date-range-filter"
+import { MetricControls } from "@/components/metric-controls"
 import { BarChart3 } from "lucide-react"
 
 export function OverviewDashboard() {
@@ -84,6 +85,7 @@ export function OverviewDashboard() {
           {/* Content Section */}
           <div className="space-y-6">
             <PerformanceChart campaignId={selectedCampaignId} workspaceId={selectedWorkspaceId} dateRange={selectedDateRange} />
+            <MetricControls className="mt-6" />
           </div>
         </main>
       </div>

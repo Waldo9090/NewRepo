@@ -16,6 +16,12 @@ export function useResolvedCampaignId(
 
   useEffect(() => {
     const resolveCampaign = async () => {
+      // Skip resolution if no campaign name is provided
+      if (!campaignName) {
+        setLoading(false)
+        return
+      }
+
       try {
         setLoading(true)
         setError(null)

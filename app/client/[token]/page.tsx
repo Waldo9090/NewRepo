@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import { ClientMetricCards } from "@/components/client-metric-cards"
 import { ClientPerformanceChart } from "@/components/client-performance-chart"
 import { ClientCampaignBreakdown } from "@/components/client-campaign-breakdown"
@@ -20,22 +20,23 @@ function getDateRangeEnd(): string {
 }
 
 interface ClientDashboardProps {
-  params: {
+  params: Promise<{
     token: string
-  }
+  }>
 }
 
 export default function ClientDashboard({ params }: ClientDashboardProps) {
+  const resolvedParams = use(params)
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>('30')
   const [campaignConfig, setCampaignConfig] = useState<ClientConfig | null>(null)
   const [selectedTab, setSelectedTab] = useState("overview")
 
   useEffect(() => {
-    const config = getClientConfig(params.token)
+    const config = getClientConfig(resolvedParams.token)
     if (config) {
       setCampaignConfig(config)
     }
-  }, [params.token])
+  }, [resolvedParams.token])
 
   if (!campaignConfig) {
     return (
@@ -73,6 +74,7 @@ export default function ClientDashboard({ params }: ClientDashboardProps) {
         <div className="mb-8">
           <ClientMetricCards 
             campaignName={campaignConfig.campaignId}
+            campaignId={campaignConfig.campaignId}
             workspaceId={campaignConfig.workspaceId}
             startDate={getDateRangeStart(selectedDateRange)}
             endDate={getDateRangeEnd()}
@@ -133,6 +135,7 @@ export default function ClientDashboard({ params }: ClientDashboardProps) {
           <div className="space-y-6">
             <ClientPerformanceChart 
               campaignName={campaignConfig.campaignId}
+              campaignId={campaignConfig.campaignId}
               workspaceId={campaignConfig.workspaceId}
               dateRange={selectedDateRange}
             />
@@ -143,6 +146,7 @@ export default function ClientDashboard({ params }: ClientDashboardProps) {
           <div className="space-y-6">
             <ClientCampaignBreakdown 
               campaignName={campaignConfig.campaignId}
+              campaignId={campaignConfig.campaignId}
               workspaceId={campaignConfig.workspaceId}
               dateRange={selectedDateRange}
             />

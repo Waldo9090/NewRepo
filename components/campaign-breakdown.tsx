@@ -182,57 +182,22 @@ export function CampaignBreakdown({ workspaceId, campaignId, dateRange }: Campai
         </p>
       </div>
       <div className="overflow-x-auto">
-        <div className="min-w-[1800px]">
+        <div className="min-w-[800px]">
           {/* Header Row */}
-          <div className="grid grid-cols-[200px_80px_100px_80px_90px_80px_80px_80px_80px_80px_80px_80px_80px_120px] gap-4 text-xs font-medium text-muted-foreground border-b pb-3 mb-4">
-            <div>Campaign</div>
-            <div className="text-center">Sent ↓</div>
-            <div className="text-center">Total Replies</div>
-            <div className="text-center">Reply Rate</div>
-            <div className="text-center">Positive Rate</div>
-            <div className="text-center">
-              <div className="mb-1">Reply Sentiment</div>
-              <div className="text-green-600">Positive</div>
-            </div>
-            <div className="text-center">
-              <div className="mb-1">&nbsp;</div>
-              <div className="text-red-600">Negative</div>
-            </div>
-            <div className="text-center">
-              <div className="mb-1">&nbsp;</div>
-              <div>Neutral</div>
-            </div>
-            <div className="text-center">
-              <div className="mb-1">Reply Source</div>
-              <div>Human</div>
-            </div>
-            <div className="text-center">
-              <div className="mb-1">&nbsp;</div>
-              <div>Bot</div>
-            </div>
-            <div className="text-center">
-              <div className="mb-1">Events</div>
-              <div>Signups</div>
-            </div>
-            <div className="text-center">
-              <div className="mb-1">&nbsp;</div>
-              <div>Meetings</div>
-            </div>
-            <div className="text-center">
-              <div className="mb-1">&nbsp;</div>
-              <div>Website Visits</div>
-            </div>
-            <div className="text-center">
-              <div className="mb-1">&nbsp;</div>
-              <div>Paying Customers</div>
-            </div>
+          <div className="grid grid-cols-[250px_120px_120px_120px_120px_120px] gap-4 text-xs font-medium text-muted-foreground border-b pb-3 mb-4">
+            <div>STEP</div>
+            <div className="text-center">SENT</div>
+            <div className="text-center">OPENED</div>
+            <div className="text-center">REPLIED</div>
+            <div className="text-center">CLICKED</div>
+            <div className="text-center">OPPORTUNITIES</div>
           </div>
 
           {/* Campaign Rows */}
           {campaigns.map((campaign) => (
             <div key={campaign.campaign_id} className="mb-4">
               {/* Main Campaign Row */}
-              <div className="grid grid-cols-[200px_80px_100px_80px_90px_80px_80px_80px_80px_80px_80px_80px_80px_120px] gap-4 items-center py-2 hover:bg-gray-50 rounded text-sm">
+              <div className="grid grid-cols-[250px_120px_120px_120px_120px_120px] gap-4 items-center py-2 hover:bg-gray-50 rounded text-sm">
                 <div>
                   <Button
                     variant="ghost"
@@ -253,56 +218,58 @@ export function CampaignBreakdown({ workspaceId, campaignId, dateRange }: Campai
                   {campaign.emails_sent_count?.toLocaleString() || '0'}
                 </div>
                 <div className="text-center">
-                  {campaign.reply_count?.toLocaleString() || '0'}
+                  <span className="text-slate-700">{campaign.open_count?.toLocaleString() || '0'}</span>
+                  <div className="text-xs text-slate-500">
+                    {campaign.emails_sent_count ? ((campaign.open_count / campaign.emails_sent_count) * 100).toFixed(2) : '0'}%
+                  </div>
                 </div>
                 <div className="text-center">
-                  <span className="text-red-500">
+                  <span className="text-slate-700">{campaign.reply_count?.toLocaleString() || '0'}</span>
+                  <div className="text-xs text-slate-500">
                     {calculateReplyRate(campaign.reply_count || 0, campaign.emails_sent_count || 0)}%
-                  </span>
+                  </div>
                 </div>
                 <div className="text-center">
-                  <span className="text-red-500">0.0%</span>
+                  <span className="text-slate-700">{campaign.link_click_count?.toLocaleString() || '0'}</span>
+                  <div className="text-xs text-slate-500">
+                    {campaign.emails_sent_count ? ((campaign.link_click_count / campaign.emails_sent_count) * 100).toFixed(2) : '0'}%
+                  </div>
                 </div>
-                <div className="text-center text-green-600">3</div>
-                <div className="text-center text-red-600">79</div>
-                <div className="text-center">418</div>
-                <div className="text-center">287</div>
-                <div className="text-center">213</div>
-                <div className="text-center">0</div>
-                <div className="text-center">0</div>
-                <div className="text-center">0</div>
-                <div className="text-center">0</div>
+                <div className="text-center">
+                  <span className="text-slate-700">{campaign.reply_count || 0}</span>
+                </div>
               </div>
 
               {/* Expanded Step/Variant Rows */}
               {expandedCampaigns.has(campaign.campaign_id) && campaign.steps?.map((step, stepIndex) => (
-                <div key={`${campaign.campaign_id}-${stepIndex}`} className="grid grid-cols-[200px_80px_100px_80px_90px_80px_80px_80px_80px_80px_80px_80px_80px_120px] gap-4 items-center py-1 hover:bg-gray-25 text-sm">
-                  <div className="pl-8 text-muted-foreground">
+                <div key={`${campaign.campaign_id}-${stepIndex}`} className="grid grid-cols-[250px_120px_120px_120px_120px_120px] gap-4 items-center py-1 hover:bg-gray-25 text-sm">
+                  <div className="pl-8 text-muted-foreground font-medium">
                     {step.variant}
                   </div>
                   <div className="text-center">
                     {step.sent?.toLocaleString() || '0'}
                   </div>
                   <div className="text-center">
-                    {step.replies?.toLocaleString() || '0'}
+                    <span className="text-slate-700">{step.opened?.toLocaleString() || '0'}</span>
+                    <div className="text-xs text-slate-500">
+                      {step.sent ? ((step.opened / step.sent) * 100).toFixed(2) : '0'}%
+                    </div>
                   </div>
                   <div className="text-center">
-                    <span className={`${calculateReplyRate(step.replies || 0, step.sent || 0) === '0.0' ? 'text-red-500' : 'text-green-500'}`}>
+                    <span className="text-slate-700">{step.replies?.toLocaleString() || '0'}</span>
+                    <div className="text-xs text-slate-500">
                       {calculateReplyRate(step.replies || 0, step.sent || 0)}%
-                    </span>
+                    </div>
                   </div>
                   <div className="text-center">
-                    <span className="text-red-500">0.0%</span>
+                    <span className="text-slate-700">{step.clicks?.toLocaleString() || '0'}</span>
+                    <div className="text-xs text-slate-500">
+                      {step.sent ? ((step.clicks / step.sent) * 100).toFixed(2) : '0'}%
+                    </div>
                   </div>
-                  <div className="text-center text-green-600">{Math.floor(Math.random() * 3)}</div>
-                  <div className="text-center text-red-600">{Math.floor(Math.random() * 15) + 5}</div>
-                  <div className="text-center">{Math.floor(Math.random() * 50) + 20}</div>
-                  <div className="text-center">{Math.floor(Math.random() * 30) + 10}</div>
-                  <div className="text-center">{Math.floor(Math.random() * 20) + 5}</div>
-                  <div className="text-center">0</div>
-                  <div className="text-center">0</div>
-                  <div className="text-center">0</div>
-                  <div className="text-center">0</div>
+                  <div className="text-center">
+                    <span className="text-slate-700">{step.replies || 0}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -310,88 +277,40 @@ export function CampaignBreakdown({ workspaceId, campaignId, dateRange }: Campai
 
           {/* Summary Row */}
           <div className="border-t pt-6 mt-6">
-            <div className="grid grid-cols-[200px_80px_100px_80px_90px_80px_80px_80px_80px_80px_80px_80px_80px_120px] gap-4 font-semibold text-lg">
+            <div className="grid grid-cols-[250px_120px_120px_120px_120px_120px] gap-4 font-semibold text-lg">
               <div>
-                <span className="text-3xl">
+                <span className="text-lg font-bold text-slate-700">Totals</span>
+              </div>
+              <div className="text-center">
+                <span className="text-2xl font-bold text-slate-700">
                   {campaigns.reduce((sum, c) => sum + (c.emails_sent_count || 0), 0).toLocaleString()}
                 </span>
                 <div className="text-xs text-muted-foreground font-normal">Total Sent</div>
               </div>
               <div className="text-center">
-                <span className="text-3xl">
+                <span className="text-2xl font-bold text-slate-700">
+                  {campaigns.reduce((sum, c) => sum + (c.open_count || 0), 0).toLocaleString()}
+                </span>
+                <div className="text-xs text-muted-foreground font-normal">Total Opened</div>
+              </div>
+              <div className="text-center">
+                <span className="text-2xl font-bold text-slate-700">
                   {campaigns.reduce((sum, c) => sum + (c.reply_count || 0), 0).toLocaleString()}
                 </span>
-                <div className="text-xs text-muted-foreground font-normal">Total Replies</div>
+                <div className="text-xs text-muted-foreground font-normal">Total Replied</div>
               </div>
               <div className="text-center">
-                <span className="text-3xl">12</span>
-                <div className="text-xs text-muted-foreground font-normal">Positive Replies</div>
+                <span className="text-2xl font-bold text-slate-700">
+                  {campaigns.reduce((sum, c) => sum + (c.link_click_count || 0), 0).toLocaleString()}
+                </span>
+                <div className="text-xs text-muted-foreground font-normal">Total Clicked</div>
               </div>
               <div className="text-center">
-                <span className="text-3xl">0.0%</span>
-                <div className="text-xs text-muted-foreground font-normal">Positive Rate</div>
+                <span className="text-2xl font-bold text-slate-700">
+                  {campaigns.reduce((sum, c) => sum + (c.reply_count || 0), 0).toLocaleString()}
+                </span>
+                <div className="text-xs text-muted-foreground font-normal">Total Opportunities</div>
               </div>
-              <div className="text-center">
-                <span className="text-3xl">151</span>
-                <div className="text-xs text-muted-foreground font-normal">Negative Replies</div>
-              </div>
-              <div className="text-center">
-                <span className="text-3xl">592</span>
-                <div className="text-xs text-muted-foreground font-normal">Neutral Replies</div>
-              </div>
-              <div className="text-center">
-                <span className="text-3xl">452</span>
-                <div className="text-xs text-muted-foreground font-normal">Human Replies</div>
-              </div>
-              <div className="text-center">
-                <span className="text-3xl">303</span>
-                <div className="text-xs text-muted-foreground font-normal">Bot Replies</div>
-              </div>
-              <div className="text-center">
-                <span className="text-3xl">0</span>
-                <div className="text-xs text-muted-foreground font-normal">Signups</div>
-              </div>
-              <div className="text-center">
-                <span className="text-3xl">0</span>
-                <div className="text-xs text-muted-foreground font-normal">Meetings</div>
-              </div>
-              <div className="text-center">
-                <span className="text-3xl">0</span>
-                <div className="text-xs text-muted-foreground font-normal">Website Visits</div>
-              </div>
-              <div className="text-center">
-                <span className="text-3xl">0</span>
-                <div className="text-xs text-muted-foreground font-normal">Paying Customers</div>
-              </div>
-              <div></div>
-              <div></div>
-            </div>
-
-            {/* Bottom Row Summary */}
-            <div className="grid grid-cols-[200px_80px_100px_80px_90px_80px_80px_80px_80px_80px_80px_80px_80px_120px] gap-4 mt-4 pt-4 border-t">
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div></div>
-              <div className="text-center font-semibold text-lg">
-                <span className="text-3xl">0</span>
-                <div className="text-xs text-muted-foreground font-normal">Meetings Booked</div>
-              </div>
-              <div className="text-center font-semibold text-lg">
-                <span className="text-3xl">0</span>
-                <div className="text-xs text-muted-foreground font-normal">Website Visits</div>
-              </div>
-              <div className="text-center font-semibold text-lg">
-                <span className="text-3xl">0</span>
-                <div className="text-xs text-muted-foreground font-normal">Paying Customers</div>
-              </div>
-              <div></div>
             </div>
           </div>
         </div>

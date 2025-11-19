@@ -3,23 +3,82 @@
 import { Mail, Loader2, Users } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { useCampaignAnalytics } from "@/hooks/use-campaign-analytics"
+import { isPrusaCampaign } from "@/hooks/use-prusa-mock-data"
 
 interface ClientMetricCardsProps {
   campaignName: string
+  campaignId?: string
   workspaceId: string
   startDate?: string
   endDate?: string
 }
 
-export function ClientMetricCards({ campaignName, workspaceId, startDate, endDate }: ClientMetricCardsProps) {
+export function ClientMetricCards({ campaignName, campaignId, workspaceId, startDate, endDate }: ClientMetricCardsProps) {
+  const isPrusa = isPrusaCampaign(campaignId || campaignName)
+  
   const { data: analytics, loading, error } = useCampaignAnalytics({
-    campaignName,
-    workspaceId,
+    campaignName: isPrusa ? undefined : campaignName,
+    workspaceId: isPrusa ? undefined : workspaceId,
     startDate,
     endDate
   })
 
-  if (loading) {
+  // Mock data for PRUSA campaigns
+  const getMockAnalytics = () => {
+    const mockData = [
+      {
+        campaign_name: 'PRUSA external company 7.9M+',
+        campaign_id: '87dcc1bb-471a-4b5a-9416-3fb2d34a1691',
+        leads_count: 1188,
+        contacted_count: 1188,
+        open_count: 601,
+        reply_count: 3,
+        emails_sent_count: 1188,
+      },
+      {
+        campaign_name: 'PRUSA Target Company 7.9M+',
+        campaign_id: 'f7275204-8c5f-449f-bb02-58e4027ecca8',
+        leads_count: 23,
+        contacted_count: 23,
+        open_count: 14,
+        reply_count: 0,
+        emails_sent_count: 23,
+      },
+      {
+        campaign_name: 'PRUSA Compass 7.9M+',
+        campaign_id: 'de0864ce-252a-4aa2-8cb7-e33e55ad5997',
+        leads_count: 125,
+        contacted_count: 125,
+        open_count: 51,
+        reply_count: 0,
+        emails_sent_count: 125,
+      },
+      {
+        campaign_name: 'PRUSA Compass Florida: Texas',
+        campaign_id: 'f211938a-9ffe-4262-9001-6e36892ba127',
+        leads_count: 2999,
+        contacted_count: 18,
+        open_count: 1,
+        reply_count: 0,
+        emails_sent_count: 18,
+      },
+      {
+        campaign_name: 'PRUSA New Campaign',
+        campaign_id: '51bab480-545d-4241-94e5-26d9e3fe34ad',
+        leads_count: 9300,
+        contacted_count: 9330,
+        open_count: 7739,
+        reply_count: 124,
+        emails_sent_count: 9330,
+      }
+    ]
+    
+    return mockData.find(c => c.campaign_id === (campaignId || campaignName))
+  }
+
+  const finalAnalytics = isPrusa ? getMockAnalytics() : analytics
+
+  if (loading && !isPrusa) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-2xl">
         {[...Array(2)].map((_, i) => (
@@ -33,7 +92,7 @@ export function ClientMetricCards({ campaignName, workspaceId, startDate, endDat
     )
   }
 
-  if (error) {
+  if (error && !isPrusa) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-2xl">
         <Card className="p-8 bg-white/60 backdrop-blur-sm border-slate-200 shadow-sm col-span-full">
@@ -49,7 +108,7 @@ export function ClientMetricCards({ campaignName, workspaceId, startDate, endDat
     )
   }
 
-  if (!analytics) {
+  if (!finalAnalytics) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-2xl">
         <Card className="p-8 bg-white/60 backdrop-blur-sm border-slate-200 shadow-sm col-span-full">
@@ -71,9 +130,9 @@ export function ClientMetricCards({ campaignName, workspaceId, startDate, endDat
           <Mail className="w-4 h-4 text-green-500" />
         </div>
         <div className="space-y-1">
-          <div className="text-4xl font-semibold">{analytics.open_count_unique.toLocaleString()}</div>
+          <div className="text-4xl font-semibold">{(finalAnalytics.open_count || finalAnalytics.open_count_unique || 0).toLocaleString()}</div>
           <p className="text-sm text-muted-foreground">
-            out of {analytics.emails_sent_count.toLocaleString()} emails sent
+            out of {finalAnalytics.emails_sent_count.toLocaleString()} emails sent
           </p>
         </div>
       </Card>
@@ -86,7 +145,7 @@ export function ClientMetricCards({ campaignName, workspaceId, startDate, endDat
         </div>
         <div className="space-y-1">
           <div className="text-4xl font-semibold">
-            {analytics.leads_count?.toLocaleString() || 'N/A'}
+            {finalAnalytics.leads_count?.toLocaleString() || 'N/A'}
           </div>
           <p className="text-sm text-muted-foreground">
             leads in list

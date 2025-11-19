@@ -15,6 +15,8 @@ function getApiKeyForWorkspace(workspaceId: string | null) {
       return process.env.INSTANTLY_API_KEY_2
     case '3':
       return process.env.INSTANTLY_API_KEY_3
+    case '4':
+      return process.env.INSTANTLY_API_KEY_4
     default:
       return process.env.INSTANTLY_API_KEY
   }

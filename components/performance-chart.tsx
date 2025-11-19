@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Mail, MessageSquare, ThumbsUp, Users, Loader2 } from "lucide-react"
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { useInstantlyDailyData } from "@/hooks/use-instantly-analytics"
+import { usePrusaMockDailyData, isPrusaCampaign } from "@/hooks/use-prusa-mock-data"
 
 interface PerformanceChartProps {
   campaignId?: string | null
@@ -43,9 +44,23 @@ const metricConfig = {
 }
 
 export function PerformanceChart({ campaignId, workspaceId, dateRange }: PerformanceChartProps) {
-  const { data: dailyData, loading, error } = useInstantlyDailyData(campaignId, workspaceId)
-  const [selectedMetric, setSelectedMetric] = useState<MetricType>('sent')
+  // Use mock data for PRUSA campaigns, real API for others
+  const isPrusa = isPrusaCampaign(campaignId)
+  const { data: realDailyData, loading: realLoading, error: realError } = useInstantlyDailyData(
+    isPrusa ? null : campaignId, 
+    isPrusa ? null : workspaceId
+  )
+  const { data: mockDailyData, loading: mockLoading, error: mockError } = usePrusaMockDailyData({
+    campaignId: isPrusa ? campaignId : null,
+    workspaceId: isPrusa ? workspaceId : null
+  })
 
+  // Choose the appropriate data source
+  const dailyData = isPrusa ? mockDailyData : realDailyData
+  const loading = isPrusa ? mockLoading : realLoading
+  const error = isPrusa ? mockError : realError
+
+  const [selectedMetric, setSelectedMetric] = useState<MetricType>('sent')
   const currentMetric = metricConfig[selectedMetric]
 
   // Format data for the chart

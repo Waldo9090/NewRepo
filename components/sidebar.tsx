@@ -11,6 +11,7 @@ export function Sidebar() {
     { icon: Activity, label: "Overview", href: "/dashboard" },
     { icon: BarChart3, label: "Analytics", href: "/dashboard/analytics" },
     { icon: Target, label: "Roger Campaigns", href: "/roger-campaigns" },
+    { icon: Target, label: "PRUSA Campaigns", href: "/prusa-campaigns" },
   ]
 
   return (
@@ -35,18 +36,18 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 border border-indigo-100 shadow-sm"
+                    ? "bg-slate-100 text-slate-800 border border-slate-200 shadow-sm"
                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:shadow-sm",
                 )}
               >
                 <div className={cn(
                   "w-5 h-5 transition-colors",
-                  isActive ? "text-indigo-600" : "text-slate-500"
+                  isActive ? "text-slate-700" : "text-slate-500"
                 )}>
                   <item.icon className="w-5 h-5" />
                 </div>
                 <span className="font-medium">{item.label}</span>
-                {(item.label === "Analytics" || item.label === "Roger Campaigns") && (
+                {(item.label === "Analytics" || item.label === "Roger Campaigns" || item.label === "PRUSA Campaigns") && (
                   <ChevronRight className={cn(
                     "w-4 h-4 ml-auto transition-colors",
                     isActive ? "text-indigo-500" : "text-slate-400"

@@ -60,7 +60,7 @@ export async function GET(
         statusText: response.statusText,
         error: errorText,
         campaignId: params.id,
-        workspace: config.name
+        workspace: workspaceId
       })
       
       if (response.status === 404) {

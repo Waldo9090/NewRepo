@@ -8,8 +8,10 @@ import { PerformanceChart } from "@/components/performance-chart"
 import { CampaignFilter } from "@/components/campaign-filter"
 import { WorkspaceFilter } from "@/components/workspace-filter"
 import { CampaignBreakdown } from "@/components/campaign-breakdown"
+import { CampaignMessages } from "@/components/campaign-messages"
 import { DateRangeFilter, type DateRange } from "@/components/date-range-filter"
-import { TrendingUp } from "lucide-react"
+import { MetricControls } from "@/components/metric-controls"
+import { TrendingUp, Mail } from "lucide-react"
 
 export function AnalyticsDashboard() {
   const [selectedTab, setSelectedTab] = useState("charts")
@@ -90,11 +92,78 @@ export function AnalyticsDashboard() {
             >
               Campaign Breakdown
             </button>
+            <button
+              onClick={() => setSelectedTab("messages")}
+              className={`flex items-center gap-3 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                selectedTab === "messages"
+                  ? "bg-white shadow-md border border-slate-200 text-slate-800"
+                  : "text-slate-600 hover:text-slate-800 hover:bg-white/50"
+              }`}
+            >
+              <Mail className="w-4 h-4" />
+              Campaign Messages
+            </button>
           </div>
 
           {/* Content Sections */}
-          {selectedTab === "charts" && <PerformanceChart campaignId={selectedCampaignId} workspaceId={selectedWorkspaceId} dateRange={selectedDateRange} />}
-          {selectedTab === "breakdown" && <CampaignBreakdown campaignId={selectedCampaignId} workspaceId={selectedWorkspaceId} dateRange={selectedDateRange} />}
+          {selectedTab === "charts" && (
+            <div className="space-y-6">
+              <PerformanceChart campaignId={selectedCampaignId} workspaceId={selectedWorkspaceId} dateRange={selectedDateRange} />
+              <MetricControls className="mt-6" />
+            </div>
+          )}
+          {selectedTab === "breakdown" && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div>
+                  <CampaignBreakdown campaignId={selectedCampaignId} workspaceId={selectedWorkspaceId} dateRange={selectedDateRange} />
+                </div>
+                <div>
+                  <div className="bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl p-6 shadow-sm">
+                    <h3 className="text-lg font-semibold text-slate-800 mb-4">Campaign Messages</h3>
+                    {selectedCampaignId ? (
+                      <CampaignMessages 
+                        campaignId={selectedCampaignId}
+                        workspaceId={selectedWorkspaceId}
+                      />
+                    ) : (
+                      <div className="text-center py-12">
+                        <div className="text-slate-500">
+                          <Mail className="w-16 h-16 mx-auto mb-4 text-slate-300" />
+                          <h3 className="text-lg font-medium text-slate-800 mb-2">Select a Campaign</h3>
+                          <p className="text-sm text-slate-600">
+                            Choose a specific campaign to view its email messages and sequences.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <MetricControls className="mt-6" />
+            </div>
+          )}
+          {selectedTab === "messages" && (
+            <div className="space-y-6">
+              {selectedCampaignId ? (
+                <CampaignMessages 
+                  campaignId={selectedCampaignId}
+                  workspaceId={selectedWorkspaceId}
+                />
+              ) : (
+                <div className="bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl p-12 shadow-sm text-center">
+                  <div className="text-slate-500">
+                    <Mail className="w-16 h-16 mx-auto mb-4 text-slate-300" />
+                    <h3 className="text-lg font-medium text-slate-800 mb-2">Select a Campaign</h3>
+                    <p className="text-sm text-slate-600">
+                      Choose a specific campaign to view its email messages and sequences.
+                    </p>
+                  </div>
+                </div>
+              )}
+              <MetricControls className="mt-6" />
+            </div>
+          )}
         </main>
       </div>
     </div>

@@ -29,6 +29,19 @@ export default function SignInPage() {
     setLoading(true)
 
     try {
+      // Check for hardcoded PRUSA authentication
+      if ((email === 'misha@prusa.com' || email === 'VPrice@prusa.com') && password === '123456') {
+        // Store PRUSA user session in localStorage
+        localStorage.setItem('prusaUser', JSON.stringify({
+          email: email,
+          displayName: email === 'misha@prusa.com' ? 'Misha' : 'VPrice',
+          loginTime: Date.now()
+        }))
+        toast.success('Signed in successfully!')
+        router.push('/prusa-campaigns')
+        return
+      }
+
       if (isSignUp) {
         await signUp(email, password)
         toast.success('Account created successfully!')
