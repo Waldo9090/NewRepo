@@ -20,43 +20,36 @@ import { Loader2, ExternalLink, BarChart3, LogOut, Mail } from "lucide-react"
 // Roger Campaigns Configuration
 const ROGER_CAMPAIGNS = [
   {
-    id: 'roger-hospital-chapel-hill',
-    name: 'Roger Hospital Chapel Hill',
-    campaignName: 'roger-hospitals-chapel-hill',
+    id: 'roger-new-real-estate-leads',
+    name: 'Roger New Real Estate Leads',
+    campaignId: 'd4e3c5ea-2bd6-46c2-9a32-2586cd7d1856',
     workspaceId: '1',
     workspaceName: 'Wings Over Campaign',
-    description: 'Healthcare campaign analytics for Chapel Hill location',
-    clientUrl: '/client/roger-hospital-chapel-hill',
+    description: 'New real estate leads campaign analytics',
+    clientUrl: '/client/roger-new-real-estate-leads',
+    instantlyUrl: 'https://app.instantly.ai/app/campaign/d4e3c5ea-2bd6-46c2-9a32-2586cd7d1856/analytics',
     status: 'Active'
   },
   {
     id: 'roger-real-estate-offices',
     name: 'Roger Real Estate Offices',
-    campaignName: 'roger-real-estate-offices', 
-    workspaceId: '3',
-    workspaceName: 'Modu campaign',
-    description: 'Real estate office outreach campaign analytics',
-    clientUrl: '/client/roger-real-estate-offices',
-    status: 'Active'
-  },
-  {
-    id: 'roger-wisconsin-leads',
-    name: 'Roger Wisconsin Leads',
-    campaignName: 'roger-wisconsin-leads',
+    campaignId: '6ffe8ad9-9695-4f4d-973f-0c20425268eb',
     workspaceId: '1',
     workspaceName: 'Wings Over Campaign',
-    description: 'Wisconsin lead generation campaign analytics',
-    clientUrl: '/client/roger-wisconsin-leads', 
+    description: 'Real estate offices campaign analytics',
+    clientUrl: '/client/roger-real-estate-offices',
+    instantlyUrl: 'https://app.instantly.ai/app/campaign/6ffe8ad9-9695-4f4d-973f-0c20425268eb/analytics',
     status: 'Active'
   },
   {
-    id: 'specific-roger-campaign',
-    name: 'Roger Campaign',
-    campaignId: '6ffe8ad9-9695-4f4d-973f-0c20425268eb',
-    workspaceId: '1', // Change this if it's in a different workspace
+    id: 'roger-hospitals-chapel-hill',
+    name: 'Roger Hospitals Chapel Hill',
+    campaignId: 'a59eefd0-0c1a-478d-bb2f-6216798fa757',
+    workspaceId: '1',
     workspaceName: 'Wings Over Campaign',
-    description: 'Direct campaign analytics using specific campaign ID',
-    clientUrl: '/client/specific-roger-campaign',
+    description: 'Hospital campaign analytics for Chapel Hill',
+    clientUrl: '/client/roger-hospitals-chapel-hill',
+    instantlyUrl: 'https://app.instantly.ai/app/campaign/a59eefd0-0c1a-478d-bb2f-6216798fa757/analytics',
     status: 'Active'
   }
 ]
@@ -254,21 +247,12 @@ export default function RogerCampaignsPage() {
                   </Card>
 
                   {/* Metrics */}
-                  {(selectedCampaign as any).campaignId ? (
-                    <RogerCampaignsMetrics 
-                      campaignId={(selectedCampaign as any).campaignId}
-                      workspaceId={selectedCampaign.workspaceId}
-                      startDate={getDateRangeStart(selectedDateRange)}
-                      endDate={getDateRangeEnd()}
-                    />
-                  ) : (
-                    <RogerCampaignResolver 
-                      campaignName={selectedCampaign.campaignName}
-                      workspaceId={selectedCampaign.workspaceId}
-                      startDate={getDateRangeStart(selectedDateRange)}
-                      endDate={getDateRangeEnd()}
-                    />
-                  )}
+                  <RogerCampaignsMetrics 
+                    campaignId={selectedCampaign.campaignId}
+                    workspaceId={selectedCampaign.workspaceId}
+                    startDate={getDateRangeStart(selectedDateRange)}
+                    endDate={getDateRangeEnd()}
+                  />
 
                   {/* Tabs */}
                   <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
@@ -282,17 +266,6 @@ export default function RogerCampaignsPage() {
                         }`}
                       >
                         Overview
-                      </button>
-                      <button
-                        onClick={() => setSelectedTab("charts")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "charts"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        <BarChart3 className="w-4 h-4" />
-                        Charts & Trends
                       </button>
                       <button
                         onClick={() => setSelectedTab("breakdown")}
@@ -321,38 +294,14 @@ export default function RogerCampaignsPage() {
                       {selectedTab === "overview" && (
                         <div className="text-center">
                           <h3 className="text-lg font-semibold text-slate-800 mb-2">Campaign Overview</h3>
-                          <p className="text-slate-600 text-sm mb-4">{selectedCampaign.description}</p>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="text-left">
-                              <span className="font-medium text-slate-700">Workspace:</span>
-                              <p className="text-slate-600">{selectedCampaign.workspaceName}</p>
-                            </div>
-                            <div className="text-left">
-                              <span className="font-medium text-slate-700">Client URL:</span>
-                              <a 
-                                href={selectedCampaign.clientUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-indigo-600 hover:text-indigo-700 text-sm flex items-center gap-1"
-                              >
-                                View Client Dashboard <ExternalLink className="w-3 h-3" />
-                              </a>
-                            </div>
-                          </div>
+                          <p className="text-slate-600 text-sm">{selectedCampaign.description}</p>
                         </div>
                       )}
 
-                      {selectedTab === "charts" && (
-                        <ClientPerformanceChart 
-                          campaignName={selectedCampaign.campaignName}
-                          workspaceId={selectedCampaign.workspaceId}
-                          dateRange={selectedDateRange}
-                        />
-                      )}
 
                       {selectedTab === "breakdown" && (
                         <ClientCampaignBreakdown 
-                          campaignName={selectedCampaign.campaignName}
+                          campaignId={selectedCampaign.campaignId}
                           workspaceId={selectedCampaign.workspaceId}
                           dateRange={selectedDateRange}
                         />
@@ -360,8 +309,7 @@ export default function RogerCampaignsPage() {
 
                       {selectedTab === "messages" && (
                         <CampaignMessages 
-                          campaignName={selectedCampaign.campaignName}
-                          campaignId={(selectedCampaign as any).campaignId}
+                          campaignId={selectedCampaign.campaignId}
                           workspaceId={selectedCampaign.workspaceId}
                         />
                       )}
@@ -498,21 +446,12 @@ export default function RogerCampaignsPage() {
                   </Card>
 
                   {/* Metrics */}
-                  {(selectedCampaign as any).campaignId ? (
-                    <RogerCampaignsMetrics 
-                      campaignId={(selectedCampaign as any).campaignId}
-                      workspaceId={selectedCampaign.workspaceId}
-                      startDate={getDateRangeStart(selectedDateRange)}
-                      endDate={getDateRangeEnd()}
-                    />
-                  ) : (
-                    <RogerCampaignResolver 
-                      campaignName={selectedCampaign.campaignName}
-                      workspaceId={selectedCampaign.workspaceId}
-                      startDate={getDateRangeStart(selectedDateRange)}
-                      endDate={getDateRangeEnd()}
-                    />
-                  )}
+                  <RogerCampaignsMetrics 
+                    campaignId={selectedCampaign.campaignId}
+                    workspaceId={selectedCampaign.workspaceId}
+                    startDate={getDateRangeStart(selectedDateRange)}
+                    endDate={getDateRangeEnd()}
+                  />
 
                   {/* Tabs */}
                   <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
@@ -526,17 +465,6 @@ export default function RogerCampaignsPage() {
                         }`}
                       >
                         Overview
-                      </button>
-                      <button
-                        onClick={() => setSelectedTab("charts")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "charts"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        <BarChart3 className="w-4 h-4" />
-                        Charts & Trends
                       </button>
                       <button
                         onClick={() => setSelectedTab("breakdown")}
@@ -565,38 +493,14 @@ export default function RogerCampaignsPage() {
                       {selectedTab === "overview" && (
                         <div className="text-center">
                           <h3 className="text-lg font-semibold text-slate-800 mb-2">Campaign Overview</h3>
-                          <p className="text-slate-600 text-sm mb-4">{selectedCampaign.description}</p>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="text-left">
-                              <span className="font-medium text-slate-700">Workspace:</span>
-                              <p className="text-slate-600">{selectedCampaign.workspaceName}</p>
-                            </div>
-                            <div className="text-left">
-                              <span className="font-medium text-slate-700">Client URL:</span>
-                              <a 
-                                href={selectedCampaign.clientUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-indigo-600 hover:text-indigo-700 text-sm flex items-center gap-1"
-                              >
-                                View Client Dashboard <ExternalLink className="w-3 h-3" />
-                              </a>
-                            </div>
-                          </div>
+                          <p className="text-slate-600 text-sm">{selectedCampaign.description}</p>
                         </div>
                       )}
 
-                      {selectedTab === "charts" && (
-                        <ClientPerformanceChart 
-                          campaignName={selectedCampaign.campaignName}
-                          workspaceId={selectedCampaign.workspaceId}
-                          dateRange={selectedDateRange}
-                        />
-                      )}
 
                       {selectedTab === "breakdown" && (
                         <ClientCampaignBreakdown 
-                          campaignName={selectedCampaign.campaignName}
+                          campaignId={selectedCampaign.campaignId}
                           workspaceId={selectedCampaign.workspaceId}
                           dateRange={selectedDateRange}
                         />
@@ -604,8 +508,7 @@ export default function RogerCampaignsPage() {
 
                       {selectedTab === "messages" && (
                         <CampaignMessages 
-                          campaignName={selectedCampaign.campaignName}
-                          campaignId={(selectedCampaign as any).campaignId}
+                          campaignId={selectedCampaign.campaignId}
                           workspaceId={selectedCampaign.workspaceId}
                         />
                       )}
