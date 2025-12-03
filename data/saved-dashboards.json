@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1764655699643oablnbgor",
+    "name": "lkn",
+    "clientUsername": "kl;n",
+    "clientPassword": "lkn",
+    "selectedWorkspaces": [
+      "1"
+    ],
+    "selectedCampaigns": [
+      "6ffe8ad9-9695-4f4d-973f-0c20425268eb",
+      "a59eefd0-0c1a-478d-bb2f-6216798fa757",
+      "d4e3c5ea-2bd6-46c2-9a32-2586cd7d1856"
+    ],
+    "createdAt": "2025-12-02T06:08:19.643Z",
+    "updatedAt": "2025-12-02T06:08:19.643Z",
+    "isActive": true
+  },
+  {
+    "id": "1764708845534ez80flfur",
+    "name": "new_one",
+    "selectedWorkspaces": [
+      "1"
+    ],
+    "selectedCampaigns": [
+      "6ffe8ad9-9695-4f4d-973f-0c20425268eb",
+      "d4e3c5ea-2bd6-46c2-9a32-2586cd7d1856",
+      "a59eefd0-0c1a-478d-bb2f-6216798fa757"
+    ],
+    "createdAt": "2025-12-02T20:54:05.534Z",
+    "updatedAt": "2025-12-02T20:54:05.534Z",
+    "isActive": true
+  },
+  {
+    "id": "1764714620521oryczg5h1",
+    "name": "the_dashboard",
+    "selectedWorkspaces": [
+      "1",
+      "2"
+    ],
+    "selectedCampaigns": [
+      "6ffe8ad9-9695-4f4d-973f-0c20425268eb",
+      "a59eefd0-0c1a-478d-bb2f-6216798fa757",
+      "51bab480-545d-4241-94e5-26d9e3fe34ad"
+    ],
+    "createdAt": "2025-12-02T22:30:20.521Z",
+    "updatedAt": "2025-12-02T22:30:20.521Z",
+    "isActive": true
+  }
+]

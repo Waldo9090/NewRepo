@@ -1,0 +1,290 @@
+YC Founders Missing LinkedIn URLs - Manual Search List
+====================================================
+
+Total: 131 founders from 85 companies need LinkedIn URLs found
+
+SEARCH PRIORITY LIST (organized by company):
+--------------------------------------------
+
+1. Aecore
+   - Anthony Cirinelli
+   - Casey Bell
+
+2. Alude
+   - Alef Miranda
+   - Jota Junior
+
+3. ArchiLabs
+   - Brian Bakerman
+   - William Meng
+
+4. Articulate
+   - Blake Passe (Note: CSV says founded by Adam Schwartz)
+   - Milind Sagaram
+
+5. Assembly HOA
+   - Allen Liou
+   - Shreyas Bharadwaj
+
+6. Banner
+   - Kunal Chaudhary
+   - Mark Murphy
+
+7. Bild AI
+   - Puneet Sukhija
+   - Roop Pal
+
+8. Bolster
+   - Mike Bignold
+
+9. Bulldozair
+   - Ali Hariri
+   - Maxence Lerigner
+
+10. Clau
+    - Bernardo Cordero
+    - Victor Noguera
+
+11. CoCrafter
+    - Annabell V.
+    - Johannes Lutz
+    - Philipp Rollwage
+
+12. Commery
+    - Andrew Zhou
+    - Eric He
+    - Lyon Aung
+
+13. Concord Materials
+    - Anthony Valente
+
+14. Constructable
+    - Emma Nazim
+    - John Yoder
+    - Molly Abbott
+
+15. Culdesac
+    - Jeff Berens
+    - Ryan Johnson
+
+16. Curri
+    - Brian Gonzalez (Note: CTO, profile not accessible)
+
+17. DigiBuild
+    - Robert Salvador
+
+18. Doorport
+    - Ben Taylor
+
+19. Downtobid
+    - Andy Lee
+    - Kevin Wu
+
+20. Foundation
+    - Derek Schairer
+    - Luke Groesbeck
+
+21. Fresco
+    - Akhil Gupta
+    - Arvind Veluvali
+
+22. Green Canopy NODE
+    - Bec Wilder
+    - Don Bunnell
+
+23. Handle.com
+    - Blake Robertson
+    - Chris Woodard
+    - Patrick Hogan
+
+24. Handoff
+    - Dmitry Alexin
+
+25. Hent
+    - David Aragao
+    - Leo Pinho
+    - Thiago Diniz
+
+26. HomeRoom
+    - Johnny Wolff
+    - Mike Tich
+    - Thomas Hornbeck
+
+27. Homebase
+    - Jun Yuan Tan
+    - Phillip An
+
+28. Houm
+    - Benjamín Labra
+    - Nicolas Knockaert
+
+29. Hutsy
+    - Rashid Aziz
+
+30. Innov8
+    - Ritesh Malik
+    - Shailesh Gupta
+    - Sumit Ranka
+
+31. InspectMind AI
+    - Aakash Prasad
+    - Shuangling Yin
+
+32. Inspectify
+    - Denis Bellavance
+    - Josh Jensen
+    - Taylor Zwisler
+
+33. Ivy Homes
+    - Abhilash Narahari
+    - Pritam Thakur
+
+34. Ladder
+    - Alex Stewart
+
+35. Laguna
+    - Parth Chopra
+
+36. Machine26
+    - Christian Schweiger
+    - Steffen Schweiger
+
+37. Modern Realty
+    - Raffi Isanians
+    - Raymond Xu
+
+38. Morada Uno
+    - Diego Llano
+    - Ines Gamboa Sorensen
+    - Santiago Morales
+
+39. Mudafy
+    - Franco Forte
+    - Luqui Díaz
+
+40. Naborly
+    - Dylan Lenz
+
+41. Obie
+    - Aaron Letzeiser
+    - Ryan Letzeiser
+
+42. Opusense AI
+    - Michael Bacani (Note: Profile not directly accessible)
+
+43. PARES AI
+    - Zihao Wang
+
+44. PermitPortal
+    - Alexandru Enache
+    - Radu Mazilu
+
+45. Permitify
+    - Adam Chandler
+    - Alexander Densley
+
+46. Pippin / Rent the Backyard
+    - Brian Bakerman
+    - Spencer Burleigh
+
+47. PropReturns
+    - Jayant Panwar
+    - Kenish Shah
+    - Somil Mathur
+
+48. Propaya
+    - Jake Golas
+    - Reader Wang
+
+49. RendaloMaq
+    - Ariel Vaisman
+    - Juan Pablo Mir
+
+50. Riley
+    - Helson Taveras
+
+51. Sakneen
+    - Hussein Elkheshen
+    - Ramy Khorshed
+
+52. SchemeFlow
+    - Andrew Browning
+    - James Griffith
+    - Jonny Browning
+
+53. Somos
+    - Forrest Heath
+
+54. TaxProper
+    - Geoff Segal
+    - Thomas Dowling
+
+55. Tolemi
+    - Andrew Kieve
+    - Nico Tejera
+
+56. TripleZip
+    - Grayson Pike
+    - Yash Sahota
+
+57. Union Apartment
+    - Chengyun Quan
+    - Yihsuan Chen
+
+58. UpCodes
+    - Garrett Reynolds
+    - Scott Reynolds
+
+59. UpEquity
+    - Timothy Herman
+
+60. VergeSense
+    - Dan Ryan
+    - Kelby Green
+
+61. Viya
+    - Benjamin Garcia
+    - Francisco Puente
+
+62. WAYLINE
+    - Eric Rowell
+    - Jason Okra
+
+63. WeReno
+    - Amrit Randhawa
+    - Harry Grewal
+
+64. ZeroDown
+    - Abhijeet Dwivedi
+    - Laks Srini
+
+65. Zorba
+    - Kobi Mantzur
+    - Or Preiss
+
+66. boxouse
+    - Luke Iseman
+
+67. disclosures.io
+    - Adam Gothelf
+    - Brian Sloss
+    - Paul Nichols
+
+68. hypcloud
+    - Yann Basly
+
+69. sizeless
+    - Cornelius von Einem
+    - Roger de Belsunce
+
+MANUAL SEARCH STRATEGY:
+======================
+
+For each founder, try these LinkedIn search approaches:
+1. Search: "FirstName LastName CompanyName YC"
+2. Search: "FirstName LastName founder CompanyName"
+3. Check company website for team/about pages
+4. Search: "FirstName LastName YC batch [S24/F24/etc]"
+5. Look for YC company directory or portfolio pages
+
+TRACKING: Mark as "Found" or "Not Found" with URL when located.

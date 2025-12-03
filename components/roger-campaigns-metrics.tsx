@@ -1,6 +1,6 @@
 'use client'
 
-import { Mail, Loader2, Users, MessageSquare, TrendingUp } from "lucide-react"
+import { Mail, Loader2, Users, MessageSquare, TrendingUp, Target } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { useCampaignsAnalytics } from "@/hooks/use-campaigns-analytics"
 import { isPrusaCampaign } from "@/hooks/use-prusa-mock-data"
@@ -227,17 +227,17 @@ export function RogerCampaignsMetrics({ campaignId, workspaceId, startDate, endD
           </div>
         </Card>
 
-        {/* Reply Rate Card - Hidden for PRUSA Compass Florida: Texas */}
+        {/* Opportunities Card - Hidden for PRUSA Compass Florida: Texas */}
         {!hideReplyRate && (
           <Card className="p-6 bg-orange-50/30 border-orange-100 shadow-sm">
             <div className="flex items-start justify-between mb-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Reply Rate</h3>
-              <MessageSquare className="w-4 h-4 text-orange-500" />
+              <h3 className="text-sm font-medium text-muted-foreground">Opportunities</h3>
+              <Target className="w-4 h-4 text-orange-500" />
             </div>
             <div className="space-y-1">
-              <div className="text-3xl font-semibold">{replyRate.toFixed(1)}%</div>
+              <div className="text-3xl font-semibold">{campaign.total_opportunities || 0}</div>
               <p className="text-sm text-muted-foreground">
-                {campaign.reply_count.toLocaleString()} replies
+                ${(campaign.total_opportunity_value || 0).toLocaleString()}
               </p>
             </div>
           </Card>

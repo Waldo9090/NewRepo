@@ -3,338 +3,279 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
-import { isRogerCampaignsOnlyUser } from "@/lib/special-users"
 import { Sidebar } from "@/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
-import { RogerCampaignResolver } from "@/components/roger-campaign-resolver"
-import { RogerCampaignsMetrics } from "@/components/roger-campaigns-metrics"
-import { ClientPerformanceChart } from "@/components/client-performance-chart"
-import { ClientCampaignBreakdown } from "@/components/client-campaign-breakdown"
-import { CampaignMessages } from "@/components/campaign-messages"
-import { DateRangeFilter, type DateRange } from "@/components/date-range-filter"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Loader2, ExternalLink, BarChart3, LogOut, Mail } from "lucide-react"
+import { UnifiedCampaignsDashboard } from "@/components/unified-campaigns-dashboard"
+import { Loader2, LogOut, AlertCircle } from "lucide-react"
 
-// Roger Campaigns Configuration
-const ROGER_CAMPAIGNS = [
-  {
-    id: 'roger-new-real-estate-leads',
-    name: 'Roger New Real Estate Leads',
-    campaignId: 'd4e3c5ea-2bd6-46c2-9a32-2586cd7d1856',
-    workspaceId: '1',
-    workspaceName: 'Wings Over Campaign',
-    description: 'New real estate leads campaign analytics',
-    clientUrl: '/client/roger-new-real-estate-leads',
-    instantlyUrl: 'https://app.instantly.ai/app/campaign/d4e3c5ea-2bd6-46c2-9a32-2586cd7d1856/analytics',
-    status: 'Active'
-  },
-  {
-    id: 'roger-real-estate-offices',
-    name: 'Roger Real Estate Offices',
-    campaignId: '6ffe8ad9-9695-4f4d-973f-0c20425268eb',
-    workspaceId: '1',
-    workspaceName: 'Wings Over Campaign',
-    description: 'Real estate offices campaign analytics',
-    clientUrl: '/client/roger-real-estate-offices',
-    instantlyUrl: 'https://app.instantly.ai/app/campaign/6ffe8ad9-9695-4f4d-973f-0c20425268eb/analytics',
-    status: 'Active'
-  },
-  {
-    id: 'roger-hospitals-chapel-hill',
-    name: 'Roger Hospitals Chapel Hill',
-    campaignId: 'a59eefd0-0c1a-478d-bb2f-6216798fa757',
-    workspaceId: '1',
-    workspaceName: 'Wings Over Campaign',
-    description: 'Hospital campaign analytics for Chapel Hill',
-    clientUrl: '/client/roger-hospitals-chapel-hill',
-    instantlyUrl: 'https://app.instantly.ai/app/campaign/a59eefd0-0c1a-478d-bb2f-6216798fa757/analytics',
-    status: 'Active'
-  }
-]
-
-function getDateRangeStart(range: DateRange): string {
-  const today = new Date()
-  const days = parseInt(range.toString())
-  const startDate = new Date(today.getTime() - (days * 24 * 60 * 60 * 1000))
-  return startDate.toISOString().split('T')[0]
-}
-
-function getDateRangeEnd(): string {
-  return new Date().toISOString().split('T')[0]
+interface UserPermissions {
+  isAdmin: boolean
+  allowedCampaigns: string[]
 }
 
 export default function RogerCampaignsPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const [selectedCampaign, setSelectedCampaign] = useState<typeof ROGER_CAMPAIGNS[0] | null>(null)
-  const [selectedTab, setSelectedTab] = useState("overview")
-  const [selectedDateRange, setSelectedDateRange] = useState<DateRange>('30')
-  const [workspaceFilter, setWorkspaceFilter] = useState<string>('all')
+  const [userPermissions, setUserPermissions] = useState<UserPermissions | null>(null)
+  const [permissionLoading, setPermissionLoading] = useState(true)
+  const [isAdminAuth, setIsAdminAuth] = useState(false)
+  const [isRegularUserAuth, setIsRegularUserAuth] = useState(false)
+
+  // EMERGENCY ADMIN BYPASS - Check localStorage immediately
+  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null
+  let storedUserData = null
+  try {
+    storedUserData = storedUser ? JSON.parse(storedUser) : null
+  } catch (e) {
+    console.error('Error parsing stored user:', e)
+  }
+  
+  // Check for both possible admin emails
+  const isEmergencyAdmin = storedUserData && (
+    storedUserData.email === 'adimahna@gmail.com' || 
+    storedUserData.email === 'adimstuff@gmail.com'
+  )
+  
+  console.log('🚨 EMERGENCY ADMIN CHECK:', { 
+    isEmergencyAdmin, 
+    storedUser: storedUser ? 'exists' : 'none',
+    storedEmail: storedUserData?.email 
+  })
 
   useEffect(() => {
-    if (!loading && !user) {
+    console.log('🔍 First useEffect - Auth check:', { user: user?.email, loading, isAdminAuth, isEmergencyAdmin, isRegularUserAuth })
+    
+    // Skip all auth checks if emergency admin
+    if (isEmergencyAdmin) {
+      console.log('🚨 SKIPPING AUTH CHECK - Emergency admin detected')
+      return
+    }
+    
+    // Check localStorage for any user (admin or regular)
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser)
+        console.log('🔍 Found stored user:', userData.email)
+        if (userData.email === 'adimahna@gmail.com' || userData.email === 'adimstuff@gmail.com') {
+          console.log('✅ Setting admin auth to true')
+          setIsAdminAuth(true)
+          return // Don't do Firebase checks for admin
+        } else {
+          console.log('✅ Setting regular user auth to true for:', userData.email)
+          setIsRegularUserAuth(true)
+          return // Don't do Firebase checks for localStorage users
+        }
+      } catch (e) {
+        console.error('Error parsing stored user:', e)
+      }
+    }
+
+    // Firebase auth check only if no localStorage user
+    if (!loading && !user && !isAdminAuth && !isRegularUserAuth) {
+      console.log('❌ No user found, redirecting to signin')
       router.push('/signin')
     }
-  }, [user, loading, router])
+  }, [user, loading, router, isAdminAuth, isEmergencyAdmin, isRegularUserAuth])
 
-  if (loading) {
+  useEffect(() => {
+    console.log('🔍 Second useEffect - Permission check trigger:', { 
+      hasUser: !!user, 
+      loading, 
+      isAdminAuth, 
+      isRegularUserAuth,
+      userEmail: user?.email,
+      isEmergencyAdmin 
+    })
+    
+    // Skip all permission checks if emergency admin
+    if (isEmergencyAdmin) {
+      console.log('🚨 SKIPPING PERMISSION CHECK - Emergency admin detected')
+      return
+    }
+    
+    if ((user && !loading) || isAdminAuth || isRegularUserAuth) {
+      console.log('✅ Conditions met, calling checkUserPermissions')
+      checkUserPermissions()
+    } else {
+      console.log('❌ Conditions not met for permission check')
+    }
+  }, [user, loading, isAdminAuth, isRegularUserAuth, isEmergencyAdmin])
+
+  const checkUserPermissions = async () => {
+    console.log('🚀 checkUserPermissions called', { isAdminAuth, isRegularUserAuth, userEmail: user?.email })
+    
+    try {
+      let email, password
+      
+      // Use localStorage data for both admin and regular users
+      if (isAdminAuth || isRegularUserAuth) {
+        console.log('📱 Using localStorage for user auth')
+        const storedUser = localStorage.getItem('user')
+        if (storedUser) {
+          const userData = JSON.parse(storedUser)
+          email = userData.email
+          password = userData.password
+          console.log('📱 Retrieved credentials:', { email })
+        }
+        
+        // For admin users, set permissions directly without API call
+        if (isAdminAuth && (email === 'adimahna@gmail.com' || email === 'adimstuff@gmail.com')) {
+          console.log('✅ ADMIN BYPASS: Setting admin permissions directly for roger-campaigns')
+          setUserPermissions({
+            isAdmin: true,
+            allowedCampaigns: ['roger', 'reachify', 'prusa', 'unified']
+          })
+          setPermissionLoading(false)
+          console.log('✅ ADMIN BYPASS: Permissions set and loading disabled')
+          return
+        }
+      } else {
+        console.log('🔥 Using Firebase user data')
+        email = user?.email
+        password = 'firebase-auth' // Placeholder for Firebase users
+        console.log('🔥 Retrieved Firebase credentials:', { email })
+      }
+
+      if (!email) {
+        console.log('❌ No email found, redirecting to signin')
+        router.push('/signin')
+        return
+      }
+
+      console.log('🌐 Making API call to check user permissions for:', email)
+      const response = await fetch('/api/user-permissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('✅ Permission API response:', data)
+        setUserPermissions({
+          isAdmin: data.isAdmin,
+          allowedCampaigns: data.allowedCampaigns || []
+        })
+
+        // Check if user has access to roger campaigns (skip check for admin users)
+        if (!data.isAdmin && !data.allowedCampaigns?.includes('roger')) {
+          console.log('❌ User does not have roger access, redirecting')
+          // Redirect to a campaign they do have access to, or show error
+          if (data.allowedCampaigns?.length > 0) {
+            const firstAllowedCampaign = data.allowedCampaigns[0]
+            console.log('🔀 Redirecting to:', `/${firstAllowedCampaign}-campaigns`)
+            router.push(`/${firstAllowedCampaign}-campaigns`)
+          } else {
+            console.log('🔀 No campaigns allowed, redirecting to signin')
+            router.push('/signin') // No access to any campaigns
+          }
+        } else {
+          console.log('✅ User has roger access or is admin')
+        }
+      } else {
+        console.log('❌ Permission API failed, redirecting to signin')
+        router.push('/signin')
+      }
+    } catch (error) {
+      console.error('💥 Error checking permissions:', error)
+      router.push('/signin')
+    } finally {
+      console.log('🏁 Setting permission loading to false')
+      setPermissionLoading(false)
+    }
+  }
+
+  // EMERGENCY ADMIN BYPASS - Render immediately for admin
+  if (isEmergencyAdmin) {
+    console.log('🚨 EMERGENCY ADMIN RENDER BYPASS')
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-500 mx-auto mb-4" />
-          <p className="text-slate-600">Loading Roger campaigns...</p>
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+        <Sidebar />
+        <div className="flex-1">
+          <DashboardHeader />
+          <main className="p-8">
+            <UnifiedCampaignsDashboard defaultCategory="roger" title="Roger Campaigns Dashboard" />
+          </main>
         </div>
       </div>
     )
   }
 
-  if (!user) {
+  console.log('🎨 Render decision:', {
+    loading,
+    isAdminAuth, 
+    permissionLoading,
+    hasUser: !!user,
+    hasUserPermissions: !!userPermissions,
+    userPermissions
+  })
+
+  if ((loading && !isAdminAuth && !isRegularUserAuth) || permissionLoading) {
+    console.log('🔄 Showing loading screen')
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-slate-500 mx-auto mb-4" />
+          <p className="text-slate-600">Loading campaigns...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if ((!user && !isAdminAuth && !isRegularUserAuth) || !userPermissions) {
+    console.log('❌ No user or permissions, returning null')
     return null
   }
 
-  // Check if this is mike@delectablecap.com for special layout
-  const isMikeUser = user.email === 'mike@delectablecap.com'
+  console.log('✅ Rendering main component with permissions:', userPermissions)
 
-  // Filter campaigns by workspace
-  const filteredCampaigns = workspaceFilter === 'all' 
-    ? ROGER_CAMPAIGNS 
-    : ROGER_CAMPAIGNS.filter(campaign => campaign.workspaceId === workspaceFilter)
+  // If user is not admin, show simplified layout without sidebar
+  const isAdmin = userPermissions.isAdmin
 
-  const workspaces = [
-    { id: 'all', name: 'All Workspaces' },
-    { id: '1', name: 'Wings Over Campaign' },
-    { id: '2', name: 'Paramount Realty USA' }
-  ]
-
-  // Special layout for mike@delectablecap.com (no sidebar)
-  if (isMikeUser) {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
-        {/* Custom header for Mike */}
+        {/* Simple header for regular users */}
         <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 text-sm">
               <div>
-                <div className="font-semibold text-xl text-slate-800 tracking-tight">Candytrail</div>
-                <div className="text-xs text-slate-500 mt-1 font-medium tracking-wide">ROGER CAMPAIGNS</div>
+                <div className="font-semibold text-xl text-slate-800 tracking-tight">
+                  Roger Campaigns
+                </div>
+                <div className="text-xs text-slate-500">
+                  Welcome, {isAdminAuth ? 'Admin User' : (isRegularUserAuth ? storedUserData?.displayName || storedUserData?.email : (user?.displayName || user?.email))}
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-3 text-sm text-slate-600">
-              <span>Welcome, {user.displayName || user.email}</span>
+              <span>{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className="rounded-xl hover:bg-red-100 text-slate-600 hover:text-red-600"
-                onClick={async () => {
-                  try {
-                    const { logout } = await import('@/contexts/AuthContext')
-                    // Handle logout here if needed
-                    router.push('/signin')
-                  } catch (error) {
-                    router.push('/signin')
-                  }
+                onClick={() => {
+                  localStorage.removeItem('user')
+                  router.push('/signin')
                 }}
               >
                 <LogOut className="w-4 h-4" />
+                Logout
               </Button>
             </div>
           </div>
         </header>
 
         <main className="p-8">
-          {/* Page Header */}
-          <div className="mb-8">
-            <div className="mb-3">
-              <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Roger Campaigns</h1>
-              <p className="text-sm text-slate-600 font-medium">
-                Manage and view analytics for all Roger campaign variations
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Panel - Campaign Selection */}
-            <div className="lg:col-span-1">
-              <Card className="p-6 bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-slate-800 mb-4">Select Campaign</h2>
-                  
-                  {/* Workspace Filter */}
-                  <div className="mb-4">
-                    <label className="text-sm font-medium text-slate-700 mb-2 block">Filter by Workspace</label>
-                    <select 
-                      value={workspaceFilter}
-                      onChange={(e) => setWorkspaceFilter(e.target.value)}
-                      className="w-full p-2 border border-slate-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      {workspaces.map((workspace) => (
-                        <option key={workspace.id} value={workspace.id}>
-                          {workspace.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Campaign List */}
-                <div className="space-y-3">
-                  {filteredCampaigns.map((campaign) => (
-                    <div
-                      key={campaign.id}
-                      onClick={() => setSelectedCampaign(campaign)}
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        selectedCampaign?.id === campaign.id
-                          ? 'border-indigo-300 bg-indigo-50/50 shadow-md'
-                          : 'border-slate-200 bg-white hover:border-indigo-200 hover:shadow-sm'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-medium text-slate-800 text-sm">{campaign.name}</h3>
-                        <Badge variant={campaign.status === 'Active' ? 'default' : 'secondary'} className="text-xs">
-                          {campaign.status}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-slate-500 mb-2">{campaign.description}</p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-400">{campaign.workspaceName}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            window.open(campaign.clientUrl, '_blank')
-                          }}
-                          className="text-xs p-1 h-auto"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {filteredCampaigns.length === 0 && (
-                  <div className="text-center text-slate-500 text-sm py-8">
-                    No campaigns found for selected workspace
-                  </div>
-                )}
-              </Card>
-            </div>
-
-            {/* Right Panel - Campaign Analytics */}
-            <div className="lg:col-span-2">
-              {selectedCampaign ? (
-                <div className="space-y-6">
-                  {/* Selected Campaign Header */}
-                  <Card className="p-6 bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h2 className="text-xl font-semibold text-slate-800">{selectedCampaign.name}</h2>
-                        <p className="text-sm text-slate-600">{selectedCampaign.workspaceName}</p>
-                      </div>
-                      <Badge variant="default" className="bg-green-100 text-green-800">
-                        {selectedCampaign.status}
-                      </Badge>
-                    </div>
-                    
-                    {/* Date Range Filter */}
-                    <DateRangeFilter 
-                      selectedRange={selectedDateRange}
-                      onRangeChange={setSelectedDateRange}
-                    />
-                  </Card>
-
-                  {/* Metrics */}
-                  <RogerCampaignsMetrics 
-                    campaignId={selectedCampaign.campaignId}
-                    workspaceId={selectedCampaign.workspaceId}
-                    startDate={getDateRangeStart(selectedDateRange)}
-                    endDate={getDateRangeEnd()}
-                  />
-
-                  {/* Tabs */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
-                    <div className="flex gap-2 p-4 border-b border-slate-200">
-                      <button
-                        onClick={() => setSelectedTab("overview")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "overview"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        Overview
-                      </button>
-                      <button
-                        onClick={() => setSelectedTab("breakdown")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "breakdown"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        Campaign Breakdown
-                      </button>
-                      <button
-                        onClick={() => setSelectedTab("messages")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "messages"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        <Mail className="w-4 h-4" />
-                        Campaign Messages
-                      </button>
-                    </div>
-
-                    <div className="p-6">
-                      {selectedTab === "overview" && (
-                        <div className="text-center">
-                          <h3 className="text-lg font-semibold text-slate-800 mb-2">Campaign Overview</h3>
-                          <p className="text-slate-600 text-sm">{selectedCampaign.description}</p>
-                        </div>
-                      )}
-
-
-                      {selectedTab === "breakdown" && (
-                        <ClientCampaignBreakdown 
-                          campaignId={selectedCampaign.campaignId}
-                          workspaceId={selectedCampaign.workspaceId}
-                          dateRange={selectedDateRange}
-                        />
-                      )}
-
-                      {selectedTab === "messages" && (
-                        <CampaignMessages 
-                          campaignId={selectedCampaign.campaignId}
-                          workspaceId={selectedCampaign.workspaceId}
-                        />
-                      )}
-                    </div>
-                  </Card>
-                </div>
-              ) : (
-                <Card className="p-12 bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm text-center">
-                  <div className="text-slate-500">
-                    <BarChart3 className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-                    <h3 className="text-lg font-medium mb-2">Select a Roger Campaign</h3>
-                    <p className="text-sm">
-                      Choose a campaign from the left panel to view its analytics and performance data.
-                    </p>
-                  </div>
-                </Card>
-              )}
-            </div>
-          </div>
+          <UnifiedCampaignsDashboard defaultCategory="roger" title="Roger Campaigns Dashboard" />
         </main>
       </div>
     )
   }
 
-  // Normal layout for other users (with sidebar)
+  // Admin layout with sidebar
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
       <Sidebar />
@@ -343,191 +284,7 @@ export default function RogerCampaignsPage() {
         <DashboardHeader />
 
         <main className="p-8">
-          {/* Page Header */}
-          <div className="mb-8">
-            <div className="mb-3">
-              <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Roger Campaigns</h1>
-              <p className="text-sm text-slate-600 font-medium">
-                Manage and view analytics for all Roger campaign variations
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Panel - Campaign Selection */}
-            <div className="lg:col-span-1">
-              <Card className="p-6 bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
-                <div className="mb-6">
-                  <h2 className="text-xl font-semibold text-slate-800 mb-4">Select Campaign</h2>
-                  
-                  {/* Workspace Filter */}
-                  <div className="mb-4">
-                    <label className="text-sm font-medium text-slate-700 mb-2 block">Filter by Workspace</label>
-                    <select 
-                      value={workspaceFilter}
-                      onChange={(e) => setWorkspaceFilter(e.target.value)}
-                      className="w-full p-2 border border-slate-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      {workspaces.map((workspace) => (
-                        <option key={workspace.id} value={workspace.id}>
-                          {workspace.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Campaign List */}
-                <div className="space-y-3">
-                  {filteredCampaigns.map((campaign) => (
-                    <div
-                      key={campaign.id}
-                      onClick={() => setSelectedCampaign(campaign)}
-                      className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        selectedCampaign?.id === campaign.id
-                          ? 'border-indigo-300 bg-indigo-50/50 shadow-md'
-                          : 'border-slate-200 bg-white hover:border-indigo-200 hover:shadow-sm'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-medium text-slate-800 text-sm">{campaign.name}</h3>
-                        <Badge variant={campaign.status === 'Active' ? 'default' : 'secondary'} className="text-xs">
-                          {campaign.status}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-slate-500 mb-2">{campaign.description}</p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-400">{campaign.workspaceName}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            window.open(campaign.clientUrl, '_blank')
-                          }}
-                          className="text-xs p-1 h-auto"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {filteredCampaigns.length === 0 && (
-                  <div className="text-center text-slate-500 text-sm py-8">
-                    No campaigns found for selected workspace
-                  </div>
-                )}
-              </Card>
-            </div>
-
-            {/* Right Panel - Campaign Analytics */}
-            <div className="lg:col-span-2">
-              {selectedCampaign ? (
-                <div className="space-y-6">
-                  {/* Selected Campaign Header */}
-                  <Card className="p-6 bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h2 className="text-xl font-semibold text-slate-800">{selectedCampaign.name}</h2>
-                        <p className="text-sm text-slate-600">{selectedCampaign.workspaceName}</p>
-                      </div>
-                      <Badge variant="default" className="bg-green-100 text-green-800">
-                        {selectedCampaign.status}
-                      </Badge>
-                    </div>
-                    
-                    {/* Date Range Filter */}
-                    <DateRangeFilter 
-                      selectedRange={selectedDateRange}
-                      onRangeChange={setSelectedDateRange}
-                    />
-                  </Card>
-
-                  {/* Metrics */}
-                  <RogerCampaignsMetrics 
-                    campaignId={selectedCampaign.campaignId}
-                    workspaceId={selectedCampaign.workspaceId}
-                    startDate={getDateRangeStart(selectedDateRange)}
-                    endDate={getDateRangeEnd()}
-                  />
-
-                  {/* Tabs */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
-                    <div className="flex gap-2 p-4 border-b border-slate-200">
-                      <button
-                        onClick={() => setSelectedTab("overview")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "overview"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        Overview
-                      </button>
-                      <button
-                        onClick={() => setSelectedTab("breakdown")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "breakdown"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        Campaign Breakdown
-                      </button>
-                      <button
-                        onClick={() => setSelectedTab("messages")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "messages"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        <Mail className="w-4 h-4" />
-                        Campaign Messages
-                      </button>
-                    </div>
-
-                    <div className="p-6">
-                      {selectedTab === "overview" && (
-                        <div className="text-center">
-                          <h3 className="text-lg font-semibold text-slate-800 mb-2">Campaign Overview</h3>
-                          <p className="text-slate-600 text-sm">{selectedCampaign.description}</p>
-                        </div>
-                      )}
-
-
-                      {selectedTab === "breakdown" && (
-                        <ClientCampaignBreakdown 
-                          campaignId={selectedCampaign.campaignId}
-                          workspaceId={selectedCampaign.workspaceId}
-                          dateRange={selectedDateRange}
-                        />
-                      )}
-
-                      {selectedTab === "messages" && (
-                        <CampaignMessages 
-                          campaignId={selectedCampaign.campaignId}
-                          workspaceId={selectedCampaign.workspaceId}
-                        />
-                      )}
-                    </div>
-                  </Card>
-                </div>
-              ) : (
-                <Card className="p-12 bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm text-center">
-                  <div className="text-slate-500">
-                    <BarChart3 className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-                    <h3 className="text-lg font-medium mb-2">Select a Roger Campaign</h3>
-                    <p className="text-sm">
-                      Choose a campaign from the left panel to view its analytics and performance data.
-                    </p>
-                  </div>
-                </Card>
-              )}
-            </div>
-          </div>
+          <UnifiedCampaignsDashboard defaultCategory="roger" title="Roger Campaigns Dashboard" />
         </main>
       </div>
     </div>

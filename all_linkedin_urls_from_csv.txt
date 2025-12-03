@@ -1,0 +1,102 @@
+ALL LINKEDIN URLS FROM YC_FOUNDERS_LINKEDIN_RESULTS.CSV
+=======================================================
+
+Total LinkedIn URLs Found: 75
+
+STANDARD LINKEDIN URLS (72):
+=============================
+
+1. https://www.linkedin.com/in/aabrbaskfna/
+2. https://www.linkedin.com/in/aakashprasad
+3. https://www.linkedin.com/in/acirinelli/
+4. https://www.linkedin.com/in/adam-chandler99/
+5. https://www.linkedin.com/in/adam-pratt-73a4aa103/
+6. https://www.linkedin.com/in/akhil-climate/
+7. https://www.linkedin.com/in/alef-miranda/
+8. https://www.linkedin.com/in/alexander-densley/
+9. https://www.linkedin.com/in/alielhariri/
+10. https://www.linkedin.com/in/allenliou1/
+11. https://www.linkedin.com/in/andrewthezhou/
+12. https://www.linkedin.com/in/andy-lee-36365963/
+13. https://www.linkedin.com/in/annabell-v-86a73b227/
+14. https://www.linkedin.com/in/arvindveluvali/
+15. https://www.linkedin.com/in/aryansharma12358/
+16. https://www.linkedin.com/in/ashwinram2002/
+17. https://www.linkedin.com/in/avhbs/
+18. https://www.linkedin.com/in/bec-wilder/
+19. https://www.linkedin.com/in/berncordero/
+20. https://www.linkedin.com/in/blak3r/
+21. https://www.linkedin.com/in/brandon-abreu-smith/
+22. https://www.linkedin.com/in/brianbakerman/
+23. https://www.linkedin.com/in/browningandrew/
+24. https://www.linkedin.com/in/casey-bell-042a9725/
+25. https://www.linkedin.com/in/cawoodard/
+26. https://www.linkedin.com/in/constructable/
+27. https://www.linkedin.com/in/corneliuseinem/
+28. https://www.linkedin.com/in/derekschairer/
+29. https://www.linkedin.com/in/dzalexin/
+30. https://www.linkedin.com/in/emmamedjuck/
+31. https://www.linkedin.com/in/errowell
+32. https://www.linkedin.com/in/francis-thumpasery/
+33. https://www.linkedin.com/in/graysonpike/
+34. https://www.linkedin.com/in/griffithjames/
+35. https://www.linkedin.com/in/h4ahmed/
+36. https://www.linkedin.com/in/issygreenslade/
+37. https://www.linkedin.com/in/jacob-golas/
+38. https://www.linkedin.com/in/jacob-phelan-9359222a5/
+39. https://www.linkedin.com/in/jeff-berens/
+40. https://www.linkedin.com/in/johannes-lutz-064a721a8/
+41. https://www.linkedin.com/in/john-yoder-92595985/
+42. https://www.linkedin.com/in/jonnybrowning/
+43. https://www.linkedin.com/in/jotajunior/
+44. https://www.linkedin.com/in/justmurph/
+45. https://www.linkedin.com/in/kevinskyewu/
+46. https://www.linkedin.com/in/kunal-chaudhary-60744298/
+47. https://www.linkedin.com/in/lerigner/
+48. https://www.linkedin.com/in/lukegroesbeck/
+49. https://www.linkedin.com/in/lyonaung/
+50. https://www.linkedin.com/in/matt-lafferty-00734b12/
+51. https://www.linkedin.com/in/michael-bacani/
+52. https://www.linkedin.com/in/michael-tich-53849b30/
+53. https://www.linkedin.com/in/mitchellrw/
+54. https://www.linkedin.com/in/naman-wahi-138567145/
+55. https://www.linkedin.com/in/nick-amore-6391a7129/
+56. https://www.linkedin.com/in/okra/
+57. https://www.linkedin.com/in/patrick-james-hogan/
+58. https://www.linkedin.com/in/philipp-rollwage/
+59. https://www.linkedin.com/in/raffi-isanians/
+60. https://www.linkedin.com/in/raymond-allie
+61. https://www.linkedin.com/in/raymond-y-xu/
+62. https://www.linkedin.com/in/raymondz1/
+63. https://www.linkedin.com/in/reader-wang-70bb31166/
+64. https://www.linkedin.com/in/rithvikchuppala/
+65. https://www.linkedin.com/in/robertjsalvador/
+66. https://www.linkedin.com/in/rogerdb/
+67. https://www.linkedin.com/in/rooppal/
+68. https://www.linkedin.com/in/royacody/
+69. https://www.linkedin.com/in/ryanjohnsonaz/
+70. https://www.linkedin.com/in/sammy-greenwall-387b3256/
+71. https://www.linkedin.com/in/samuelklam/
+72. https://www.linkedin.com/in/samuelli97/
+73. https://www.linkedin.com/in/shreyas-bharadwaj/
+74. https://www.linkedin.com/in/shuangly/
+75. https://www.linkedin.com/in/sidharthrajaram/
+76. https://www.linkedin.com/in/taylorbk/
+77. https://www.linkedin.com/in/thiagodiniz/
+78. https://www.linkedin.com/in/vnoguera/
+79. https://www.linkedin.com/in/william-meng/
+80. https://www.linkedin.com/in/zihao-wang-mh/
+
+INTERNATIONAL LINKEDIN URLS (3):
+==================================
+
+Brazilian LinkedIn:
+81. https://br.linkedin.com/in/davidaragao1
+82. https://br.linkedin.com/in/leo-pinho
+
+Canadian LinkedIn:
+83. https://ca.linkedin.com/in/mike-bignold-6092a27
+
+=======================================================
+TOTAL: 75 LinkedIn URLs from YC Founders CSV file
+=======================================================

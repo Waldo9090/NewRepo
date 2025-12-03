@@ -1,0 +1,71 @@
+[
+  {
+    "id": "269f73d8-68e5-459b-bedb-0621fe791a28",
+    "email": "adimahna@gmail.com",
+    "password": "admin123",
+    "displayName": "Admin User",
+    "createdAt": "2025-12-03T01:09:42.656Z",
+    "isActive": true,
+    "allowedCampaigns": [
+      "roger",
+      "reachify",
+      "prusa",
+      "unified"
+    ]
+  },
+  {
+    "id": "eeb185de-8e6d-415c-82ca-7d66da955cf4",
+    "email": "mike@delectablecap.com",
+    "password": "123456",
+    "displayName": "Mike",
+    "createdAt": "2025-12-03T07:42:49.377Z",
+    "isActive": true,
+    "allowedCampaigns": [
+      "roger"
+    ]
+  },
+  {
+    "id": "bb509613-5f7a-49fc-932c-3e9c4e18befc",
+    "email": "kristi.kaiser@wingsover.com",
+    "password": "123456",
+    "displayName": "Kristi",
+    "createdAt": "2025-12-03T07:43:41.661Z",
+    "isActive": true,
+    "allowedCampaigns": [
+      "roger"
+    ]
+  },
+  {
+    "id": "f149ec8f-7847-436a-9a6d-95e83450a956",
+    "email": "zjadia@reachify.io",
+    "password": "123456",
+    "displayName": "Zeel",
+    "createdAt": "2025-12-03T07:44:39.478Z",
+    "isActive": true,
+    "allowedCampaigns": [
+      "reachify"
+    ]
+  },
+  {
+    "id": "02563369-d82b-490e-ba1d-0e592204ad8c",
+    "email": "misha@prusa.com",
+    "password": "123456",
+    "displayName": "Misha",
+    "createdAt": "2025-12-03T07:45:05.224Z",
+    "isActive": true,
+    "allowedCampaigns": [
+      "prusa"
+    ]
+  },
+  {
+    "id": "215769f1-68f3-4019-9e3c-639d0b8808dc",
+    "email": "vprice@prusa.com",
+    "password": "123456",
+    "displayName": "Victoria",
+    "createdAt": "2025-12-03T07:45:35.068Z",
+    "isActive": true,
+    "allowedCampaigns": [
+      "prusa"
+    ]
+  }
+]

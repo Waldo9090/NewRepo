@@ -188,9 +188,9 @@ export function CampaignBreakdown({ workspaceId, campaignId, dateRange }: Campai
             <div>STEP</div>
             <div className="text-center">SENT</div>
             <div className="text-center">OPENED</div>
-            <div className="text-center">REPLIED</div>
-            <div className="text-center">CLICKED</div>
             <div className="text-center">OPPORTUNITIES</div>
+            <div className="text-center">CLICKED</div>
+            <div className="text-center">REPLIED</div>
           </div>
 
           {/* Campaign Rows */}
@@ -224,9 +224,9 @@ export function CampaignBreakdown({ workspaceId, campaignId, dateRange }: Campai
                   </div>
                 </div>
                 <div className="text-center">
-                  <span className="text-slate-700">{campaign.reply_count?.toLocaleString() || '0'}</span>
+                  <span className="text-slate-700">{campaign.total_opportunities?.toLocaleString() || '0'}</span>
                   <div className="text-xs text-slate-500">
-                    {calculateReplyRate(campaign.reply_count || 0, campaign.emails_sent_count || 0)}%
+                    ${(campaign.total_opportunity_value || 0).toLocaleString()}
                   </div>
                 </div>
                 <div className="text-center">
@@ -236,7 +236,10 @@ export function CampaignBreakdown({ workspaceId, campaignId, dateRange }: Campai
                   </div>
                 </div>
                 <div className="text-center">
-                  <span className="text-slate-700">{campaign.reply_count || 0}</span>
+                  <span className="text-slate-700">{campaign.reply_count?.toLocaleString() || '0'}</span>
+                  <div className="text-xs text-slate-500">
+                    {calculateReplyRate(campaign.reply_count || 0, campaign.emails_sent_count || 0)}%
+                  </div>
                 </div>
               </div>
 
@@ -256,7 +259,7 @@ export function CampaignBreakdown({ workspaceId, campaignId, dateRange }: Campai
                     </div>
                   </div>
                   <div className="text-center">
-                    <span className="text-slate-700">{step.replies?.toLocaleString() || '0'}</span>
+                    <span className="text-slate-700">{step.replies || 0}</span>
                     <div className="text-xs text-slate-500">
                       {calculateReplyRate(step.replies || 0, step.sent || 0)}%
                     </div>
@@ -268,7 +271,10 @@ export function CampaignBreakdown({ workspaceId, campaignId, dateRange }: Campai
                     </div>
                   </div>
                   <div className="text-center">
-                    <span className="text-slate-700">{step.replies || 0}</span>
+                    <span className="text-slate-700">{step.replies?.toLocaleString() || '0'}</span>
+                    <div className="text-xs text-slate-500">
+                      {calculateReplyRate(step.replies || 0, step.sent || 0)}%
+                    </div>
                   </div>
                 </div>
               ))}
@@ -295,9 +301,9 @@ export function CampaignBreakdown({ workspaceId, campaignId, dateRange }: Campai
               </div>
               <div className="text-center">
                 <span className="text-2xl font-bold text-slate-700">
-                  {campaigns.reduce((sum, c) => sum + (c.reply_count || 0), 0).toLocaleString()}
+                  {campaigns.reduce((sum, c) => sum + (c.total_opportunities || 0), 0).toLocaleString()}
                 </span>
-                <div className="text-xs text-muted-foreground font-normal">Total Replied</div>
+                <div className="text-xs text-muted-foreground font-normal">Total Opportunities</div>
               </div>
               <div className="text-center">
                 <span className="text-2xl font-bold text-slate-700">
@@ -309,7 +315,7 @@ export function CampaignBreakdown({ workspaceId, campaignId, dateRange }: Campai
                 <span className="text-2xl font-bold text-slate-700">
                   {campaigns.reduce((sum, c) => sum + (c.reply_count || 0), 0).toLocaleString()}
                 </span>
-                <div className="text-xs text-muted-foreground font-normal">Total Opportunities</div>
+                <div className="text-xs text-muted-foreground font-normal">Total Replied</div>
               </div>
             </div>
           </div>

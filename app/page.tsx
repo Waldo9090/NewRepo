@@ -11,6 +11,20 @@ export default function RootPage() {
   const router = useRouter()
 
   useEffect(() => {
+    // Check if admin is authenticated via localStorage
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser)
+        if (userData.email === 'adimahna@gmail.com') {
+          router.push('/dashboard')
+          return
+        }
+      } catch (e) {
+        console.error('Error parsing stored user:', e)
+      }
+    }
+
     if (!loading) {
       if (user) {
         // Special routing for Roger Campaigns only users

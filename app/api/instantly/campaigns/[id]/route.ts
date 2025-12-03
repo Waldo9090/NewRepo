@@ -22,11 +22,12 @@ function getApiKeyForWorkspace(workspaceId: string | null) {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { searchParams } = new URL(request.url)
     const workspaceId = searchParams.get('workspaceId')
+    const resolvedParams = await params
 
     if (!workspaceId) {
       return NextResponse.json(
@@ -45,7 +46,7 @@ export async function GET(
     }
 
     // Fetch specific campaign details from Instantly API
-    const response = await fetch(`https://api.instantly.ai/api/v2/campaigns/${params.id}`, {
+    const response = await fetch(`https://api.instantly.ai/api/v2/campaigns/${resolvedParams.id}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -59,7 +60,7 @@ export async function GET(
         status: response.status,
         statusText: response.statusText,
         error: errorText,
-        campaignId: params.id,
+        campaignId: resolvedParams.id,
         workspace: workspaceId
       })
       

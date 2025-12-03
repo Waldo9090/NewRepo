@@ -5,94 +5,162 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 import { Sidebar } from "@/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
-import { RogerCampaignsMetrics } from "@/components/roger-campaigns-metrics"
-import { ClientPerformanceChart } from "@/components/client-performance-chart"
-import { ClientCampaignBreakdown } from "@/components/client-campaign-breakdown"
-import { CampaignMessages } from "@/components/campaign-messages"
-import { PrusaCampaignList } from "@/components/prusa-campaign-list"
-import { DateRangeFilter, type DateRange } from "@/components/date-range-filter"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Loader2, BarChart3, LogOut, Mail, ExternalLink } from "lucide-react"
+import { UnifiedCampaignsDashboard } from "@/components/unified-campaigns-dashboard"
+import { Loader2, LogOut, AlertCircle } from "lucide-react"
 
-interface CampaignData {
-  campaign_name: string
-  campaign_id: string
-  campaign_status: number
-  campaign_is_evergreen: boolean
-  leads_count: number
-  contacted_count: number
-  open_count: number
-  reply_count: number
-  link_click_count: number
-  bounced_count: number
-  unsubscribed_count: number
-  completed_count: number
-  emails_sent_count: number
-  new_leads_contacted_count: number
-  total_opportunities: number
-  total_opportunity_value: number
-}
-
-function getDateRangeStart(range: DateRange): string {
-  const today = new Date()
-  const days = parseInt(range.toString())
-  const startDate = new Date(today.getTime() - (days * 24 * 60 * 60 * 1000))
-  return startDate.toISOString().split('T')[0]
-}
-
-function getDateRangeEnd(): string {
-  return new Date().toISOString().split('T')[0]
-}
-
-function getCampaignStatusLabel(status: number): string {
-  switch (status) {
-    case 0: return 'Draft'
-    case 1: return 'Active'
-    case 2: return 'Paused'
-    case 3: return 'Completed'
-    case 4: return 'Running Subsequences'
-    case -99: return 'Account Suspended'
-    case -1: return 'Accounts Unhealthy'
-    case -2: return 'Bounce Protect'
-    default: return 'Unknown'
-  }
+interface UserPermissions {
+  isAdmin: boolean
+  allowedCampaigns: string[]
 }
 
 export default function PrusaCampaignsPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const [selectedCampaign, setSelectedCampaign] = useState<CampaignData | null>(null)
-  const [selectedTab, setSelectedTab] = useState("overview")
-  const [selectedDateRange, setSelectedDateRange] = useState<DateRange>('30')
-  const [prusaUser, setPrusaUser] = useState<any>(null)
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
-  const workspaceId = '2' // PRUSA campaigns are in workspace 2
+  const [userPermissions, setUserPermissions] = useState<UserPermissions | null>(null)
+  const [permissionLoading, setPermissionLoading] = useState(true)
+  const [isAdminAuth, setIsAdminAuth] = useState(false)
+
+  // EMERGENCY ADMIN BYPASS - Check localStorage immediately
+  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null
+  const isEmergencyAdmin = storedUser && JSON.parse(storedUser)?.email === 'adimahna@gmail.com'
+  
+  console.log('🚨 EMERGENCY ADMIN CHECK (PRUSA):', { isEmergencyAdmin, storedUser: storedUser ? 'exists' : 'none' })
 
   useEffect(() => {
-    // Check for PRUSA user session in localStorage
-    const prusaUserData = localStorage.getItem('prusaUser')
-    if (prusaUserData) {
+    console.log('🔍 First useEffect - Auth check (PRUSA):', { user: user?.email, loading, isAdminAuth, isEmergencyAdmin })
+    
+    // Skip all auth checks if emergency admin
+    if (isEmergencyAdmin) {
+      console.log('🚨 SKIPPING AUTH CHECK - Emergency admin detected (PRUSA)')
+      return
+    }
+    
+    // Check if admin is authenticated via localStorage first
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
       try {
-        const userData = JSON.parse(prusaUserData)
-        setPrusaUser(userData)
-        setIsCheckingAuth(false)
-        return
+        const userData = JSON.parse(storedUser)
+        if (userData.email === 'adimahna@gmail.com') {
+          setIsAdminAuth(true)
+          return // Don't do Firebase checks for admin
+        }
       } catch (e) {
-        localStorage.removeItem('prusaUser')
+        console.error('Error parsing stored user:', e)
       }
     }
 
-    // If no PRUSA user, check regular auth
-    if (!loading && !user) {
+    // Regular Firebase auth check only if not admin
+    if (!loading && !user && !isAdminAuth) {
       router.push('/signin')
-    } else {
-      setIsCheckingAuth(false)
     }
-  }, [user, loading, router])
+  }, [user, loading, router, isAdminAuth, isEmergencyAdmin])
 
-  if (loading || isCheckingAuth) {
+  useEffect(() => {
+    console.log('🔍 Second useEffect - Permission check trigger (PRUSA):', { 
+      hasUser: !!user, 
+      loading, 
+      isAdminAuth, 
+      userEmail: user?.email,
+      isEmergencyAdmin 
+    })
+    
+    // Skip all permission checks if emergency admin
+    if (isEmergencyAdmin) {
+      console.log('🚨 SKIPPING PERMISSION CHECK - Emergency admin detected (PRUSA)')
+      return
+    }
+    
+    if ((user && !loading) || isAdminAuth) {
+      checkUserPermissions()
+    }
+  }, [user, loading, isAdminAuth, isEmergencyAdmin])
+
+  const checkUserPermissions = async () => {
+    try {
+      let email, password
+      
+      // Use localStorage data for admin, Firebase data for others
+      if (isAdminAuth) {
+        const storedUser = localStorage.getItem('user')
+        if (storedUser) {
+          const userData = JSON.parse(storedUser)
+          email = userData.email
+          password = userData.password
+        }
+        
+        // For admin users, set permissions directly without API call
+        if (email === 'adimahna@gmail.com') {
+          console.log('Setting admin permissions directly for prusa-campaigns')
+          setUserPermissions({
+            isAdmin: true,
+            allowedCampaigns: ['roger', 'reachify', 'prusa', 'unified']
+          })
+          setPermissionLoading(false)
+          return
+        }
+      } else {
+        email = user?.email
+        // Remove password from Firebase user as it doesn't exist
+        password = 'firebase-auth' // Placeholder for Firebase users
+      }
+
+      if (!email || !password) {
+        router.push('/signin')
+        return
+      }
+
+      const response = await fetch('/api/user-permissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setUserPermissions({
+          isAdmin: data.isAdmin,
+          allowedCampaigns: data.allowedCampaigns || []
+        })
+
+        // Check if user has access to prusa campaigns
+        if (!data.isAdmin && !data.allowedCampaigns?.includes('prusa')) {
+          // Redirect to a campaign they do have access to, or show error
+          if (data.allowedCampaigns?.length > 0) {
+            const firstAllowedCampaign = data.allowedCampaigns[0]
+            router.push(`/${firstAllowedCampaign}-campaigns`)
+          } else {
+            router.push('/signin') // No access to any campaigns
+          }
+        }
+      } else {
+        router.push('/signin')
+      }
+    } catch (error) {
+      console.error('Error checking permissions:', error)
+      router.push('/signin')
+    } finally {
+      setPermissionLoading(false)
+    }
+  }
+
+  // EMERGENCY ADMIN BYPASS - Render immediately for admin
+  if (isEmergencyAdmin) {
+    console.log('🚨 EMERGENCY ADMIN RENDER BYPASS (PRUSA)')
+    return (
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+        <Sidebar />
+        <div className="flex-1">
+          <DashboardHeader />
+          <main className="p-8">
+            <UnifiedCampaignsDashboard defaultCategory="prusa" title="PRUSA Campaigns Dashboard" />
+          </main>
+        </div>
+      </div>
+    )
+  }
+
+  if ((loading && !isAdminAuth) || permissionLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
         <div className="text-center">
@@ -103,200 +171,55 @@ export default function PrusaCampaignsPage() {
     )
   }
 
-  if (!user && !prusaUser) {
+  if ((!user && !isAdminAuth) || !userPermissions) {
     return null
   }
 
-  // Check if this is a PRUSA user for special layout (no sidebar)
-  const isPrusaUser = prusaUser || (user && (user.email === 'misha@prusa.com' || user.email === 'VPrice@prusa.com' || user.email === 'mike@delectablecap.com'))
+  // If user is not admin, show simplified layout without sidebar
+  const isAdmin = userPermissions.isAdmin
 
-  // Special layout for PRUSA users (no sidebar)
-  if (isPrusaUser) {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
-        {/* Custom header for PRUSA users */}
+        {/* Simple header for regular users */}
         <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 text-sm">
               <div>
-                <div className="font-semibold text-xl text-slate-800 tracking-tight">Candytrail</div>
-                <div className="text-xs text-slate-500 mt-1 font-medium tracking-wide">PRUSA CAMPAIGNS</div>
+                <div className="font-semibold text-xl text-slate-800 tracking-tight">
+                  PRUSA Campaigns
+                </div>
+                <div className="text-xs text-slate-500">
+                  Welcome, {isAdminAuth ? 'Admin User' : (user?.displayName || user?.email)}
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-3 text-sm text-slate-600">
-              <span>Welcome, {prusaUser ? prusaUser.displayName : (user.displayName || user.email)}</span>
+              <span>{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className="rounded-xl hover:bg-red-100 text-slate-600 hover:text-red-600"
-                onClick={async () => {
-                  if (prusaUser) {
-                    // Clear PRUSA user session
-                    localStorage.removeItem('prusaUser')
-                  } else {
-                    try {
-                      const { logout } = await import('@/contexts/AuthContext')
-                      // Handle logout here if needed
-                    } catch (error) {
-                      // Ignore error, just redirect
-                    }
-                  }
+                onClick={() => {
+                  localStorage.removeItem('user')
                   router.push('/signin')
                 }}
               >
                 <LogOut className="w-4 h-4" />
+                Logout
               </Button>
             </div>
           </div>
         </header>
 
         <main className="p-8">
-          {/* Page Header */}
-          <div className="mb-8">
-            <div className="mb-3">
-              <h1 className="text-3xl font-bold text-slate-800 tracking-tight">PRUSA Campaigns</h1>
-              <p className="text-sm text-slate-600 font-medium">
-                Manage and view analytics for all PRUSA campaign variations
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Panel - Campaign Selection */}
-            <div className="lg:col-span-1">
-              <PrusaCampaignList
-                workspaceId={workspaceId}
-                selectedCampaign={selectedCampaign}
-                onSelectCampaign={setSelectedCampaign}
-              />
-            </div>
-
-            {/* Right Panel - Campaign Analytics */}
-            <div className="lg:col-span-2">
-              {selectedCampaign ? (
-                <div className="space-y-6">
-                  {/* Selected Campaign Header */}
-                  <Card className="p-6 bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h2 className="text-xl font-semibold text-slate-800">{selectedCampaign.campaign_name}</h2>
-                        <p className="text-sm text-slate-600">Paramount Realty USA</p>
-                      </div>
-                    </div>
-                    
-                    {/* Date Range Filter */}
-                    <DateRangeFilter 
-                      selectedRange={selectedDateRange}
-                      onRangeChange={setSelectedDateRange}
-                    />
-                  </Card>
-
-                  {/* Metrics */}
-                  <RogerCampaignsMetrics 
-                    campaignId={selectedCampaign.campaign_id}
-                    workspaceId={workspaceId}
-                    startDate={getDateRangeStart(selectedDateRange)}
-                    endDate={getDateRangeEnd()}
-                  />
-
-                  {/* Tabs */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
-                    <div className="flex gap-2 p-4 border-b border-slate-200">
-                      <button
-                        onClick={() => setSelectedTab("overview")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "overview"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        Overview
-                      </button>
-                      <button
-                        onClick={() => setSelectedTab("breakdown")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "breakdown"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        Campaign Breakdown
-                      </button>
-                      <button
-                        onClick={() => setSelectedTab("messages")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "messages"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        <Mail className="w-4 h-4" />
-                        Campaign Messages
-                      </button>
-                    </div>
-
-                    <div className="p-6">
-                      {selectedTab === "overview" && (
-                        <div className="text-center">
-                          <h3 className="text-lg font-semibold text-slate-800 mb-2">Campaign Overview</h3>
-                          <p className="text-slate-600 text-sm mb-4">{selectedCampaign.description}</p>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="text-left">
-                              <span className="font-medium text-slate-700">Workspace:</span>
-                              <p className="text-slate-600">{selectedCampaign.workspaceName}</p>
-                            </div>
-                            <div className="text-left">
-                              <span className="font-medium text-slate-700">Client URL:</span>
-                              <a 
-                                href={selectedCampaign.clientUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-indigo-600 hover:text-indigo-700 text-sm flex items-center gap-1"
-                              >
-                                View Client Dashboard <ExternalLink className="w-3 h-3" />
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-
-                      {selectedTab === "breakdown" && (
-                        <ClientCampaignBreakdown 
-                          campaignId={selectedCampaign.campaign_id}
-                          workspaceId={workspaceId}
-                          dateRange={selectedDateRange}
-                        />
-                      )}
-
-                      {selectedTab === "messages" && (
-                        <CampaignMessages 
-                          campaignId={selectedCampaign.campaign_id}
-                          workspaceId={workspaceId}
-                        />
-                      )}
-                    </div>
-                  </Card>
-                </div>
-              ) : (
-                <Card className="p-12 bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm text-center">
-                  <div className="text-slate-500">
-                    <BarChart3 className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-                    <h3 className="text-lg font-medium mb-2">Select a PRUSA Campaign</h3>
-                    <p className="text-sm">
-                      Choose a campaign from the left panel to view its analytics and performance data.
-                    </p>
-                  </div>
-                </Card>
-              )}
-            </div>
-          </div>
+          <UnifiedCampaignsDashboard defaultCategory="prusa" title="PRUSA Campaigns Dashboard" />
         </main>
       </div>
     )
   }
 
-  // Normal layout for other users (with sidebar)
+  // Admin layout with sidebar
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
       <Sidebar />
@@ -305,146 +228,7 @@ export default function PrusaCampaignsPage() {
         <DashboardHeader />
 
         <main className="p-8">
-          {/* Page Header */}
-          <div className="mb-8">
-            <div className="mb-3">
-              <h1 className="text-3xl font-bold text-slate-800 tracking-tight">PRUSA Campaigns</h1>
-              <p className="text-sm text-slate-600 font-medium">
-                Manage and view analytics for all PRUSA campaign variations
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Panel - Campaign Selection */}
-            <div className="lg:col-span-1">
-              <PrusaCampaignList
-                workspaceId={workspaceId}
-                selectedCampaign={selectedCampaign}
-                onSelectCampaign={setSelectedCampaign}
-              />
-            </div>
-
-            {/* Right Panel - Campaign Analytics */}
-            <div className="lg:col-span-2">
-              {selectedCampaign ? (
-                <div className="space-y-6">
-                  {/* Selected Campaign Header */}
-                  <Card className="p-6 bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h2 className="text-xl font-semibold text-slate-800">{selectedCampaign.campaign_name}</h2>
-                        <p className="text-sm text-slate-600">Paramount Realty USA</p>
-                      </div>
-                    </div>
-                    
-                    {/* Date Range Filter */}
-                    <DateRangeFilter 
-                      selectedRange={selectedDateRange}
-                      onRangeChange={setSelectedDateRange}
-                    />
-                  </Card>
-
-                  {/* Metrics */}
-                  <RogerCampaignsMetrics 
-                    campaignId={selectedCampaign.campaign_id}
-                    workspaceId={workspaceId}
-                    startDate={getDateRangeStart(selectedDateRange)}
-                    endDate={getDateRangeEnd()}
-                  />
-
-                  {/* Tabs */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
-                    <div className="flex gap-2 p-4 border-b border-slate-200">
-                      <button
-                        onClick={() => setSelectedTab("overview")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "overview"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        Overview
-                      </button>
-                      <button
-                        onClick={() => setSelectedTab("breakdown")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "breakdown"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        Campaign Breakdown
-                      </button>
-                      <button
-                        onClick={() => setSelectedTab("messages")}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          selectedTab === "messages"
-                            ? "bg-indigo-100 text-indigo-700"
-                            : "text-slate-600 hover:text-slate-800 hover:bg-slate-50"
-                        }`}
-                      >
-                        <Mail className="w-4 h-4" />
-                        Campaign Messages
-                      </button>
-                    </div>
-
-                    <div className="p-6">
-                      {selectedTab === "overview" && (
-                        <div className="text-center">
-                          <h3 className="text-lg font-semibold text-slate-800 mb-2">Campaign Overview</h3>
-                          <p className="text-slate-600 text-sm mb-4">{selectedCampaign.description}</p>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="text-left">
-                              <span className="font-medium text-slate-700">Workspace:</span>
-                              <p className="text-slate-600">{selectedCampaign.workspaceName}</p>
-                            </div>
-                            <div className="text-left">
-                              <span className="font-medium text-slate-700">Client URL:</span>
-                              <a 
-                                href={selectedCampaign.clientUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-indigo-600 hover:text-indigo-700 text-sm flex items-center gap-1"
-                              >
-                                View Client Dashboard <ExternalLink className="w-3 h-3" />
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-
-                      {selectedTab === "breakdown" && (
-                        <ClientCampaignBreakdown 
-                          campaignId={selectedCampaign.campaign_id}
-                          workspaceId={workspaceId}
-                          dateRange={selectedDateRange}
-                        />
-                      )}
-
-                      {selectedTab === "messages" && (
-                        <CampaignMessages 
-                          campaignId={selectedCampaign.campaign_id}
-                          workspaceId={workspaceId}
-                        />
-                      )}
-                    </div>
-                  </Card>
-                </div>
-              ) : (
-                <Card className="p-12 bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm text-center">
-                  <div className="text-slate-500">
-                    <BarChart3 className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-                    <h3 className="text-lg font-medium mb-2">Select a PRUSA Campaign</h3>
-                    <p className="text-sm">
-                      Choose a campaign from the left panel to view its analytics and performance data.
-                    </p>
-                  </div>
-                </Card>
-              )}
-            </div>
-          </div>
+          <UnifiedCampaignsDashboard defaultCategory="prusa" title="PRUSA Campaigns Dashboard" />
         </main>
       </div>
     </div>

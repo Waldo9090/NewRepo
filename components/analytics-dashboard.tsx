@@ -9,9 +9,11 @@ import { CampaignFilter } from "@/components/campaign-filter"
 import { WorkspaceFilter } from "@/components/workspace-filter"
 import { CampaignBreakdown } from "@/components/campaign-breakdown"
 import { CampaignMessages } from "@/components/campaign-messages"
+import { CampaignLeads } from "@/components/campaign-leads"
+import { SimpleEmailInbox } from "@/components/simple-email-inbox"
 import { DateRangeFilter, type DateRange } from "@/components/date-range-filter"
 import { MetricControls } from "@/components/metric-controls"
-import { TrendingUp, Mail } from "lucide-react"
+import { TrendingUp, Mail, User, Inbox } from "lucide-react"
 
 export function AnalyticsDashboard() {
   const [selectedTab, setSelectedTab] = useState("charts")
@@ -103,6 +105,28 @@ export function AnalyticsDashboard() {
               <Mail className="w-4 h-4" />
               Campaign Messages
             </button>
+            <button
+              onClick={() => setSelectedTab("leads")}
+              className={`flex items-center gap-3 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                selectedTab === "leads"
+                  ? "bg-white shadow-md border border-slate-200 text-slate-800"
+                  : "text-slate-600 hover:text-slate-800 hover:bg-white/50"
+              }`}
+            >
+              <User className="w-4 h-4" />
+              Leads
+            </button>
+            <button
+              onClick={() => setSelectedTab("inbox")}
+              className={`flex items-center gap-3 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                selectedTab === "inbox"
+                  ? "bg-white shadow-md border border-slate-200 text-slate-800"
+                  : "text-slate-600 hover:text-slate-800 hover:bg-white/50"
+              }`}
+            >
+              <Inbox className="w-4 h-4" />
+              Inbox
+            </button>
           </div>
 
           {/* Content Sections */}
@@ -161,6 +185,36 @@ export function AnalyticsDashboard() {
                   </div>
                 </div>
               )}
+              <MetricControls className="mt-6" />
+            </div>
+          )}
+          {selectedTab === "leads" && (
+            <div className="space-y-6">
+              {selectedCampaignId ? (
+                <CampaignLeads 
+                  campaignId={selectedCampaignId}
+                  workspaceId={selectedWorkspaceId}
+                />
+              ) : (
+                <div className="bg-white/60 backdrop-blur-sm border border-slate-200 rounded-xl p-12 shadow-sm text-center">
+                  <div className="text-slate-500">
+                    <User className="w-16 h-16 mx-auto mb-4 text-slate-300" />
+                    <h3 className="text-lg font-medium text-slate-800 mb-2">Select a Campaign</h3>
+                    <p className="text-sm text-slate-600">
+                      Choose a specific campaign to view its leads and their interest status.
+                    </p>
+                  </div>
+                </div>
+              )}
+              <MetricControls className="mt-6" />
+            </div>
+          )}
+          {selectedTab === "inbox" && (
+            <div className="space-y-6">
+              <SimpleEmailInbox 
+                campaignId={selectedCampaignId}
+                workspaceId={selectedWorkspaceId}
+              />
               <MetricControls className="mt-6" />
             </div>
           )}

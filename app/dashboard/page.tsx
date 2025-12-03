@@ -12,6 +12,21 @@ export default function DashboardPage() {
   const router = useRouter()
 
   useEffect(() => {
+    // Check if admin is logged in via localStorage
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser)
+        if (userData.email === 'adimahna@gmail.com') {
+          // Admin is authenticated via our system, allow access
+          return
+        }
+      } catch (e) {
+        console.error('Error parsing stored user:', e)
+      }
+    }
+
+    // Regular Firebase auth checks
     if (!loading) {
       if (!user) {
         router.push('/signin')
@@ -22,7 +37,19 @@ export default function DashboardPage() {
     }
   }, [user, loading, router])
 
-  if (loading) {
+  // Check if admin is authenticated via localStorage
+  const storedUser = localStorage.getItem('user')
+  let isAdminAuth = false
+  if (storedUser) {
+    try {
+      const userData = JSON.parse(storedUser)
+      isAdminAuth = userData.email === 'adimahna@gmail.com'
+    } catch (e) {
+      console.error('Error parsing stored user:', e)
+    }
+  }
+
+  if (loading && !isAdminAuth) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
         <div className="text-center">
@@ -33,7 +60,7 @@ export default function DashboardPage() {
     )
   }
 
-  if (!user) {
+  if (!user && !isAdminAuth) {
     return null // Will redirect to signin
   }
 

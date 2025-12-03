@@ -34,46 +34,82 @@ export async function GET(request: NextRequest) {
     console.log('=== Campaigns Analytics API Request ===')
     console.log('Request params:', { campaignId, workspaceId, startDate, endDate, excludeTotalLeadsCount })
     
+    // Validate workspace ID
+    if (!workspaceId || workspaceId === 'undefined' || workspaceId === 'null') {
+      console.error('Invalid workspace ID:', workspaceId)
+      return NextResponse.json(
+        { error: 'Invalid workspace ID provided' },
+        { status: 400 }
+      )
+    }
+    
     const apiKey = getApiKeyForWorkspace(workspaceId)
     
     if (!apiKey) {
+      console.error('No API key found for workspace:', workspaceId)
       return NextResponse.json(
         { error: 'API key not configured for selected workspace' },
         { status: 500 }
       )
     }
     
+    // Validate campaign ID
+    if (campaignId && (campaignId === 'null' || campaignId === 'undefined')) {
+      console.error('Invalid campaign ID:', campaignId)
+      return NextResponse.json(
+        { error: 'Invalid campaign ID provided' },
+        { status: 400 }
+      )
+    }
+
     // Build query parameters for campaigns analytics
     const params = new URLSearchParams()
     if (campaignId) {
       params.append('id', campaignId)
     }
-    if (startDate) {
+    if (startDate && startDate !== 'null') {
       params.append('start_date', startDate)
     }
-    if (endDate) {
+    if (endDate && endDate !== 'null') {
       params.append('end_date', endDate)
     }
     if (excludeTotalLeadsCount === 'true') {
       params.append('exclude_total_leads_count', 'true')
     }
     
+    const url = `${INSTANTLY_BASE_URL}/api/v2/campaigns/analytics?${params.toString()}`
+    console.log('Fetching from URL:', url)
+    
     // Get campaigns analytics
-    const response = await fetch(
-      `${INSTANTLY_BASE_URL}/api/v2/campaigns/analytics?${params.toString()}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      console.error('Campaigns Analytics API Error:', errorData)
+      const responseText = await response.text()
+      let errorData
+      try {
+        errorData = JSON.parse(responseText)
+      } catch {
+        errorData = { message: responseText || 'Unknown error' }
+      }
+      
+      console.error('Campaigns Analytics API Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData,
+        url: url
+      })
+      
       return NextResponse.json(
-        { error: errorData.message || `HTTP ${response.status}` },
+        { 
+          statusCode: response.status,
+          error: response.statusText,
+          message: errorData.message || 'Something went wrong, please try again'
+        },
         { status: response.status }
       )
     }
