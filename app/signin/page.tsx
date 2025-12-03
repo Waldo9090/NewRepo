@@ -18,17 +18,23 @@ export default function SignInPage() {
 
   // Redirect if already authenticated
   useEffect(() => {
-    // Check if admin is logged in via localStorage
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser)
-        if (userData.email === 'adimahna@gmail.com') {
-          router.push('/dashboard')
-          return
+    // Check if any user is logged in via localStorage (client-side only)
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser)
+          if (userData.email === 'adimahna@gmail.com') {
+            router.push('/dashboard')
+            return
+          } else {
+            // Regular user - redirect to their first allowed campaign
+            // This will be handled by the API response, but for now redirect to dashboard
+            console.log('User already logged in:', userData.email)
+          }
+        } catch (e) {
+          console.error('Error parsing stored user:', e)
         }
-      } catch (e) {
-        console.error('Error parsing stored user:', e)
       }
     }
     
@@ -57,18 +63,7 @@ export default function SignInPage() {
         return
       }
 
-      // Check for hardcoded PRUSA authentication
-      if ((email === 'misha@prusa.com' || email === 'VPrice@prusa.com') && password === '123456') {
-        // Store PRUSA user session in localStorage
-        localStorage.setItem('prusaUser', JSON.stringify({
-          email: email,
-          displayName: email === 'misha@prusa.com' ? 'Misha' : 'VPrice',
-          loginTime: Date.now()
-        }))
-        toast.success('Signed in successfully!')
-        router.push('/prusa-campaigns')
-        return
-      }
+      // This hardcoded check is no longer needed - remove it since we have the user system
 
       // Try regular user system first
       try {
