@@ -20,10 +20,22 @@ export default function PrusaCampaignsPage() {
   const [userPermissions, setUserPermissions] = useState<UserPermissions | null>(null)
   const [permissionLoading, setPermissionLoading] = useState(true)
   const [isAdminAuth, setIsAdminAuth] = useState(false)
+  const [isRegularUserAuth, setIsRegularUserAuth] = useState(false)
 
   // EMERGENCY ADMIN BYPASS - Check localStorage immediately
   const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null
-  const isEmergencyAdmin = storedUser && JSON.parse(storedUser)?.email === 'adimahna@gmail.com'
+  let storedUserData = null
+  try {
+    storedUserData = storedUser ? JSON.parse(storedUser) : null
+  } catch (e) {
+    console.error('Error parsing stored user:', e)
+  }
+  
+  // Check for both possible admin emails
+  const isEmergencyAdmin = storedUserData && (
+    storedUserData.email === 'adimahna@gmail.com' || 
+    storedUserData.email === 'adimstuff@gmail.com'
+  )
   
   console.log('🚨 EMERGENCY ADMIN CHECK (PRUSA):', { isEmergencyAdmin, storedUser: storedUser ? 'exists' : 'none' })
 
@@ -36,31 +48,39 @@ export default function PrusaCampaignsPage() {
       return
     }
     
-    // Check if admin is authenticated via localStorage first
+    // Check localStorage for any user (admin or regular)
     const storedUser = localStorage.getItem('user')
     if (storedUser) {
       try {
         const userData = JSON.parse(storedUser)
-        if (userData.email === 'adimahna@gmail.com') {
+        console.log('🔍 Found stored user:', userData.email)
+        if (userData.email === 'adimahna@gmail.com' || userData.email === 'adimstuff@gmail.com') {
+          console.log('✅ Setting admin auth to true')
           setIsAdminAuth(true)
           return // Don't do Firebase checks for admin
+        } else {
+          console.log('✅ Setting regular user auth to true for:', userData.email)
+          setIsRegularUserAuth(true)
+          return // Don't do Firebase checks for localStorage users
         }
       } catch (e) {
         console.error('Error parsing stored user:', e)
       }
     }
 
-    // Regular Firebase auth check only if not admin
-    if (!loading && !user && !isAdminAuth) {
+    // Firebase auth check only if no localStorage user
+    if (!loading && !user && !isAdminAuth && !isRegularUserAuth) {
+      console.log('❌ No user found, redirecting to signin')
       router.push('/signin')
     }
-  }, [user, loading, router, isAdminAuth, isEmergencyAdmin])
+  }, [user, loading, router, isAdminAuth, isEmergencyAdmin, isRegularUserAuth])
 
   useEffect(() => {
     console.log('🔍 Second useEffect - Permission check trigger (PRUSA):', { 
       hasUser: !!user, 
       loading, 
       isAdminAuth, 
+      isRegularUserAuth,
       userEmail: user?.email,
       isEmergencyAdmin 
     })
@@ -71,38 +91,62 @@ export default function PrusaCampaignsPage() {
       return
     }
     
-    if ((user && !loading) || isAdminAuth) {
+    if ((user && !loading) || isAdminAuth || isRegularUserAuth) {
+      console.log('✅ Conditions met, calling checkUserPermissions')
       checkUserPermissions()
+    } else {
+      console.log('❌ Conditions not met for permission check')
     }
-  }, [user, loading, isAdminAuth, isEmergencyAdmin])
+  }, [user, loading, isAdminAuth, isRegularUserAuth, isEmergencyAdmin])
 
   const checkUserPermissions = async () => {
     try {
       let email, password
       
-      // Use localStorage data for admin, Firebase data for others
-      if (isAdminAuth) {
+      // Use localStorage data for both admin and regular users
+      if (isAdminAuth || isRegularUserAuth) {
+        console.log('📱 Using localStorage for user auth')
         const storedUser = localStorage.getItem('user')
         if (storedUser) {
           const userData = JSON.parse(storedUser)
           email = userData.email
           password = userData.password
+          console.log('📱 Retrieved credentials:', { email })
         }
         
         // For admin users, set permissions directly without API call
-        if (email === 'adimahna@gmail.com') {
-          console.log('Setting admin permissions directly for prusa-campaigns')
+        if (isAdminAuth && (email === 'adimahna@gmail.com' || email === 'adimstuff@gmail.com')) {
+          console.log('✅ ADMIN BYPASS: Setting admin permissions directly for prusa-campaigns')
           setUserPermissions({
             isAdmin: true,
             allowedCampaigns: ['roger', 'reachify', 'prusa', 'unified']
           })
           setPermissionLoading(false)
+          console.log('✅ ADMIN BYPASS: Permissions set and loading disabled')
           return
         }
+        
+        // For regular users, also skip API call and use localStorage data directly  
+        if (isRegularUserAuth && email) {
+          console.log('✅ REGULAR USER BYPASS: Using localStorage data directly for:', email)
+          // Use the stored user data to set permissions without API call
+          const storedUser = localStorage.getItem('user')
+          if (storedUser) {
+            const userData = JSON.parse(storedUser)
+            setUserPermissions({
+              isAdmin: false,
+              allowedCampaigns: userData.allowedCampaigns || []
+            })
+            setPermissionLoading(false)
+            console.log('✅ REGULAR USER: Permissions set from localStorage', userData.allowedCampaigns)
+            return
+          }
+        }
       } else {
+        console.log('🔥 Using Firebase user data')
         email = user?.email
-        // Remove password from Firebase user as it doesn't exist
         password = 'firebase-auth' // Placeholder for Firebase users
+        console.log('🔥 Retrieved Firebase credentials:', { email })
       }
 
       if (!email || !password) {
@@ -160,7 +204,7 @@ export default function PrusaCampaignsPage() {
     )
   }
 
-  if ((loading && !isAdminAuth) || permissionLoading) {
+  if ((loading && !isAdminAuth && !isRegularUserAuth) || permissionLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
         <div className="text-center">
@@ -171,7 +215,7 @@ export default function PrusaCampaignsPage() {
     )
   }
 
-  if ((!user && !isAdminAuth) || !userPermissions) {
+  if ((!user && !isAdminAuth && !isRegularUserAuth) || !userPermissions) {
     return null
   }
 
@@ -190,7 +234,7 @@ export default function PrusaCampaignsPage() {
                   PRUSA Campaigns
                 </div>
                 <div className="text-xs text-slate-500">
-                  Welcome, {isAdminAuth ? 'Admin User' : (user?.displayName || user?.email)}
+                  Welcome, {isAdminAuth ? 'Admin User' : (isRegularUserAuth ? storedUserData?.displayName || storedUserData?.email : (user?.displayName || user?.email))}
                 </div>
               </div>
             </div>
