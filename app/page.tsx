@@ -11,17 +11,19 @@ export default function RootPage() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check if admin is authenticated via localStorage
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser)
-        if (userData.email === 'adimahna@gmail.com') {
-          router.push('/dashboard')
-          return
+    // Check if admin is authenticated via localStorage (only on client)
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser)
+          if (userData.email === 'adimahna@gmail.com') {
+            router.push('/dashboard')
+            return
+          }
+        } catch (e) {
+          console.error('Error parsing stored user:', e)
         }
-      } catch (e) {
-        console.error('Error parsing stored user:', e)
       }
     }
 

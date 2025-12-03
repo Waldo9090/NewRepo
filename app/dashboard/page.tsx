@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { isRogerCampaignsOnlyUser } from '@/lib/special-users'
@@ -10,19 +10,26 @@ import { Loader2 } from 'lucide-react'
 export default function DashboardPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const [isAdminAuth, setIsAdminAuth] = useState(false)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    // Check if admin is logged in via localStorage
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser)
-        if (userData.email === 'adimahna@gmail.com') {
-          // Admin is authenticated via our system, allow access
-          return
+    // Set client flag to avoid SSR issues
+    setIsClient(true)
+
+    // Check if admin is logged in via localStorage (only on client)
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser)
+          if (userData.email === 'adimahna@gmail.com') {
+            setIsAdminAuth(true)
+            return
+          }
+        } catch (e) {
+          console.error('Error parsing stored user:', e)
         }
-      } catch (e) {
-        console.error('Error parsing stored user:', e)
       }
     }
 
@@ -37,19 +44,8 @@ export default function DashboardPage() {
     }
   }, [user, loading, router])
 
-  // Check if admin is authenticated via localStorage
-  const storedUser = localStorage.getItem('user')
-  let isAdminAuth = false
-  if (storedUser) {
-    try {
-      const userData = JSON.parse(storedUser)
-      isAdminAuth = userData.email === 'adimahna@gmail.com'
-    } catch (e) {
-      console.error('Error parsing stored user:', e)
-    }
-  }
-
-  if (loading && !isAdminAuth) {
+  // Show loading until client-side hydration is complete
+  if (!isClient || (loading && !isAdminAuth)) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
         <div className="text-center">
