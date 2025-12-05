@@ -9,6 +9,8 @@ import { InterestedLeadsThreads } from "@/components/interested-leads-threads"
 import { FromAddressList } from "@/components/from-address-list"
 import { EmailFrameworks } from "@/components/email-frameworks"
 import { UserManagement } from "@/components/user-management"
+import { CampaignBreakdown } from "@/components/campaign-breakdown"
+import { CampaignMessages } from "@/components/campaign-messages"
 import { 
   Loader2, 
   BarChart3, 
@@ -19,6 +21,7 @@ import {
   TrendingUp, 
   Calendar, 
   ChevronDown,
+  ChevronRight,
   Settings,
   Check,
   UserCog
@@ -68,14 +71,100 @@ export function UnifiedCampaignsDashboard({
   const [error, setError] = useState<string | null>(null)
   const [totals, setTotals] = useState<CampaignAnalytics | null>(null)
   const [showCampaignSelector, setShowCampaignSelector] = useState(false)
+  const [expandedCampaigns, setExpandedCampaigns] = useState<Set<string>>(new Set())
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
-  // Check if current user is admin
-  const isAdmin = user?.email === 'adimahna@gmail.com'
+  // Check if current user is admin (including localStorage check)
+  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null
+  let storedUserData = null
+  try {
+    storedUserData = storedUser ? JSON.parse(storedUser) : null
+  } catch (e) {
+    console.error('Error parsing stored user:', e)
+  }
+  
+  const isAdmin = user?.email === 'adimahna@gmail.com' || 
+                  storedUserData?.email === 'adimahna@gmail.com' ||
+                  storedUserData?.email === 'adimstuff@gmail.com'
+
+  // Toggle expanded campaign
+  const toggleExpandedCampaign = (campaignId: string) => {
+    setExpandedCampaigns(prev => {
+      const newExpanded = new Set(prev)
+      if (newExpanded.has(campaignId)) {
+        newExpanded.delete(campaignId)
+      } else {
+        newExpanded.add(campaignId)
+      }
+      return newExpanded
+    })
+  }
+
+  // Handle campaign selection changes
+  const handleCampaignToggle = (campaignId: string) => {
+    setCampaigns(prev => {
+      const updated = prev.map(campaign => 
+        campaign.id === campaignId 
+          ? { ...campaign, selected: !campaign.selected }
+          : campaign
+      )
+      setHasUnsavedChanges(true)
+      return updated
+    })
+  }
+
+  // Save campaign selections
+  const saveCampaignSelections = async () => {
+    if (!isAdmin) return
+    
+    setIsSaving(true)
+    try {
+      const selectedCampaignIds = campaigns
+        .filter(c => c.selected)
+        .map(c => c.campaignId)
+
+      const response = await fetch('/api/admin/campaign-preferences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category: defaultCategory,
+          selectedCampaigns: selectedCampaignIds
+        })
+      })
+
+      if (response.ok) {
+        setHasUnsavedChanges(false)
+        // Show success message or toast
+      } else {
+        throw new Error('Failed to save preferences')
+      }
+    } catch (error) {
+      console.error('Error saving campaign preferences:', error)
+      // Show error message or toast
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   // Get selected campaigns and determine display category
   const selectedCampaigns = campaigns.filter(c => c.selected)
   const selectedCategories = [...new Set(selectedCampaigns.map(c => c.category))]
   const displayCategory = selectedCategories.length === 1 ? selectedCategories[0] : 'all'
+
+  // Load saved preferences
+  const loadSavedPreferences = async () => {
+    try {
+      const response = await fetch('/api/admin/campaign-preferences')
+      if (response.ok) {
+        const preferences = await response.json()
+        return preferences[defaultCategory] || []
+      }
+    } catch (error) {
+      console.error('Error loading preferences:', error)
+    }
+    return []
+  }
 
   useEffect(() => {
     async function fetchAllCampaigns() {
@@ -83,6 +172,9 @@ export function UnifiedCampaignsDashboard({
       setError(null)
       
       try {
+        // Load saved preferences first
+        const savedCampaignIds = await loadSavedPreferences()
+        
         const categories = ['roger', 'reachify', 'prusa']
         const allCampaignsData: Campaign[] = []
         let aggregatedTotals: CampaignAnalytics = {
@@ -111,16 +203,26 @@ export function UnifiedCampaignsDashboard({
               const categoryData = await response.json()
               
               // Add campaigns with category info
-              const categoryCampaigns = categoryData.campaigns?.map((campaign: any) => ({
-                id: `${category}-${campaign.id || campaign.campaign_id}`,
-                name: campaign.name || campaign.campaign_name,
-                campaignId: campaign.id || campaign.campaign_id,
-                workspaceId: campaign.workspaceId || '1',
-                workspaceName: campaign.workspaceName || 'Default Workspace',
-                category: category as 'roger' | 'reachify' | 'prusa',
-                analytics: campaign.analytics || campaign,
-                selected: defaultCategory === 'all' || defaultCategory === category
-              })) || []
+              const categoryCampaigns = categoryData.campaigns?.map((campaign: any) => {
+                const campaignId = campaign.id || campaign.campaign_id
+                const prefixedId = `${category}-${campaignId}`
+                
+                // Check if this campaign is in saved preferences
+                const isSelected = savedCampaignIds.length > 0 
+                  ? savedCampaignIds.includes(campaignId) || savedCampaignIds.includes(prefixedId)
+                  : (defaultCategory === 'all' || defaultCategory === category)
+                
+                return {
+                  id: prefixedId,
+                  name: campaign.name || campaign.campaign_name,
+                  campaignId: campaignId,
+                  workspaceId: campaign.workspaceId || '1',
+                  workspaceName: campaign.workspaceName || 'Default Workspace',
+                  category: category as 'roger' | 'reachify' | 'prusa',
+                  analytics: campaign.analytics || campaign,
+                  selected: isSelected
+                }
+              }) || []
               
               allCampaignsData.push(...categoryCampaigns)
               
@@ -164,14 +266,17 @@ export function UnifiedCampaignsDashboard({
         ? { ...campaign, selected: !campaign.selected }
         : campaign
     ))
+    setHasUnsavedChanges(true)
   }
 
   const selectAllCampaigns = () => {
     setCampaigns(prev => prev.map(campaign => ({ ...campaign, selected: true })))
+    setHasUnsavedChanges(true)
   }
 
   const deselectAllCampaigns = () => {
     setCampaigns(prev => prev.map(campaign => ({ ...campaign, selected: false })))
+    setHasUnsavedChanges(true)
   }
 
   const selectCategoryOnly = (category: 'roger' | 'reachify' | 'prusa') => {
@@ -179,16 +284,26 @@ export function UnifiedCampaignsDashboard({
       ...campaign, 
       selected: campaign.category === category 
     })))
+    setHasUnsavedChanges(true)
   }
 
-  // Calculate metrics from selected campaigns
+  // Calculate metrics from selected campaigns with validation
   const selectedTotals = selectedCampaigns.reduce((acc, campaign) => {
     const analytics = campaign.analytics
     if (analytics) {
-      acc.leads_count += analytics.leads_count || 0
-      acc.emails_sent_count += analytics.emails_sent_count || 0
-      acc.reply_count += analytics.reply_count || 0
-      acc.open_count += analytics.open_count || 0
+      const leads = analytics.leads_count || 0
+      const emailsSent = analytics.emails_sent_count || 0
+      const rawOpens = analytics.open_count || 0
+      const rawReplies = analytics.reply_count || 0
+      
+      // Validate individual campaign metrics before aggregation
+      const validatedOpens = Math.min(rawOpens, emailsSent)
+      const validatedReplies = Math.min(rawReplies, emailsSent)
+      
+      acc.leads_count += leads
+      acc.emails_sent_count += emailsSent
+      acc.reply_count += validatedReplies
+      acc.open_count += validatedOpens
       acc.total_opportunities += analytics.total_opportunities || 0
       acc.total_opportunity_value += analytics.total_opportunity_value || 0
     }
@@ -202,8 +317,18 @@ export function UnifiedCampaignsDashboard({
     total_opportunity_value: 0
   })
 
-  const replyRate = selectedTotals.emails_sent_count > 0 
-    ? ((selectedTotals.reply_count / selectedTotals.emails_sent_count) * 100) 
+  // Additional validation for metrics not handled in aggregation
+  const validatedTotals = {
+    ...selectedTotals,
+    // These metrics are now validated during aggregation, but add fallback validation
+    bounced_count: Math.min(selectedTotals.bounced_count || 0, selectedTotals.emails_sent_count),
+    unsubscribed_count: Math.min(selectedTotals.unsubscribed_count || 0, selectedTotals.emails_sent_count),
+    link_click_count: Math.min(selectedTotals.link_click_count || 0, selectedTotals.open_count),
+    contacted_count: Math.min(selectedTotals.contacted_count || 0, selectedTotals.leads_count)
+  }
+
+  const replyRate = validatedTotals.emails_sent_count > 0 
+    ? ((validatedTotals.reply_count / validatedTotals.emails_sent_count) * 100) 
     : 0
 
   if (loading) {
@@ -228,6 +353,11 @@ export function UnifiedCampaignsDashboard({
           </p>
         </div>
         
+        {/* Debug info for Admin Button */}
+        <div className="text-xs bg-red-50 p-2 rounded border">
+          Admin Check: user={user?.email}, stored={storedUserData?.email}, isAdmin={isAdmin.toString()}
+        </div>
+        
         {isAdmin && (
           <Button
             onClick={() => setShowCampaignSelector(!showCampaignSelector)}
@@ -238,6 +368,12 @@ export function UnifiedCampaignsDashboard({
             Select Campaigns
             <ChevronDown className={`w-4 h-4 transition-transform ${showCampaignSelector ? 'rotate-180' : ''}`} />
           </Button>
+        )}
+        
+        {!isAdmin && (
+          <div className="text-xs text-red-600 bg-red-50 p-2 rounded border">
+            ❌ Not admin - Select Campaigns button hidden
+          </div>
         )}
       </div>
 
@@ -281,6 +417,39 @@ export function UnifiedCampaignsDashboard({
               </div>
             ))}
           </div>
+          
+          {/* Save Button */}
+          {isAdmin && hasUnsavedChanges && (
+            <div className="mt-6 pt-4 border-t border-slate-200 bg-blue-50 -mx-6 -mb-6 px-6 pb-6 rounded-b-lg">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-slate-700 font-medium">
+                  ⚠️ You have unsaved changes to <span className="capitalize font-bold">{defaultCategory}</span> campaign selections.
+                </div>
+                <Button 
+                  onClick={saveCampaignSelections}
+                  disabled={isSaving}
+                  className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+                  size="sm"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    '💾 Save Changes'
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Debug Info (remove after testing) */}
+          {isAdmin && (
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+              Debug: Admin={isAdmin.toString()}, HasChanges={hasUnsavedChanges.toString()}, Category={defaultCategory}
+            </div>
+          )}
         </Card>
       )}
 
@@ -361,7 +530,7 @@ export function UnifiedCampaignsDashboard({
                   <span className="text-sm font-medium text-slate-600">Sourced</span>
                 </div>
                 <div className="text-3xl font-bold text-slate-800 mb-2">
-                  {selectedTotals.leads_count.toLocaleString()}
+                  {validatedTotals.leads_count.toLocaleString()}
                 </div>
                 <div className="text-sm text-slate-500">
                   From {selectedCampaigns.length} campaigns
@@ -375,7 +544,7 @@ export function UnifiedCampaignsDashboard({
                   <span className="text-sm font-medium text-slate-600">Emails Sent</span>
                 </div>
                 <div className="text-3xl font-bold text-slate-800 mb-2">
-                  {selectedTotals.emails_sent_count.toLocaleString()}
+                  {validatedTotals.emails_sent_count.toLocaleString()}
                 </div>
               </Card>
 
@@ -386,7 +555,7 @@ export function UnifiedCampaignsDashboard({
                   <span className="text-sm font-medium text-slate-600">Replies</span>
                 </div>
                 <div className="text-3xl font-bold text-slate-800 mb-2">
-                  {selectedTotals.reply_count.toLocaleString()}
+                  {validatedTotals.reply_count.toLocaleString()}
                 </div>
                 <div className="text-sm text-slate-500">
                   ({replyRate.toFixed(1)}%)
@@ -400,7 +569,7 @@ export function UnifiedCampaignsDashboard({
                   <span className="text-sm font-medium text-slate-600">Opens</span>
                 </div>
                 <div className="text-3xl font-bold text-slate-800 mb-2">
-                  {selectedTotals.open_count.toLocaleString()}
+                  {validatedTotals.open_count.toLocaleString()}
                 </div>
               </Card>
 
@@ -411,10 +580,10 @@ export function UnifiedCampaignsDashboard({
                   <span className="text-sm font-medium text-slate-600">Opportunities</span>
                 </div>
                 <div className="text-3xl font-bold text-slate-800 mb-2">
-                  {selectedTotals.total_opportunities.toLocaleString()}
+                  {validatedTotals.total_opportunities.toLocaleString()}
                 </div>
                 <div className="text-sm text-slate-500">
-                  ${selectedTotals.total_opportunity_value.toLocaleString()}
+                  ${validatedTotals.total_opportunity_value.toLocaleString()}
                 </div>
               </Card>
             </div>
@@ -428,6 +597,7 @@ export function UnifiedCampaignsDashboard({
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-slate-200">
+                      <th className="text-left py-3 px-2 font-medium text-slate-600 text-sm w-8"></th>
                       <th className="text-left py-3 px-2 font-medium text-slate-600 text-sm">Campaign</th>
                       <th className="text-left py-3 px-2 font-medium text-slate-600 text-sm">Category</th>
                       <th className="text-left py-3 px-2 font-medium text-slate-600 text-sm">Sourced</th>
@@ -442,43 +612,87 @@ export function UnifiedCampaignsDashboard({
                       const campaignReplyRate = analytics?.emails_sent_count > 0 
                         ? ((analytics.reply_count / analytics.emails_sent_count) * 100) 
                         : 0
+                      const isExpanded = expandedCampaigns.has(campaign.campaignId)
                       
                       return (
-                        <tr key={campaign.id} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="py-4 px-2">
-                            <div className="font-medium text-slate-800 text-sm">{campaign.name}</div>
-                          </td>
-                          <td className="py-4 px-2">
-                            <span className={`text-xs px-2 py-1 rounded-full capitalize ${
-                              campaign.category === 'roger' ? 'bg-blue-100 text-blue-800' :
-                              campaign.category === 'reachify' ? 'bg-green-100 text-green-800' :
-                              'bg-purple-100 text-purple-800'
-                            }`}>
-                              {campaign.category}
-                            </span>
-                          </td>
-                          <td className="py-4 px-2">
-                            <div className="text-sm font-medium text-slate-800">
-                              {analytics?.leads_count?.toLocaleString() || 0}
-                            </div>
-                          </td>
-                          <td className="py-4 px-2">
-                            <div className="text-sm font-medium text-slate-800">
-                              {analytics?.emails_sent_count?.toLocaleString() || 0}
-                            </div>
-                          </td>
-                          <td className="py-4 px-2">
-                            <div className="text-sm font-medium text-slate-800">
-                              {analytics?.reply_count?.toLocaleString() || 0}
-                            </div>
-                            <div className="text-xs text-slate-500">({campaignReplyRate.toFixed(1)}%)</div>
-                          </td>
-                          <td className="py-4 px-2">
-                            <div className="text-sm font-medium text-slate-800">
-                              {analytics?.open_count?.toLocaleString() || 0}
-                            </div>
-                          </td>
-                        </tr>
+                        <>
+                          <tr key={campaign.id} className="hover:bg-slate-50/50 transition-colors">
+                            <td className="py-4 px-2">
+                              <button
+                                onClick={() => toggleExpandedCampaign(campaign.campaignId)}
+                                className="p-1 hover:bg-slate-200 rounded transition-colors"
+                              >
+                                {isExpanded ? (
+                                  <ChevronDown className="w-4 h-4 text-slate-600" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4 text-slate-600" />
+                                )}
+                              </button>
+                            </td>
+                            <td className="py-4 px-2">
+                              <div className="font-medium text-slate-800 text-sm">{campaign.name}</div>
+                            </td>
+                            <td className="py-4 px-2">
+                              <span className={`text-xs px-2 py-1 rounded-full capitalize ${
+                                campaign.category === 'roger' ? 'bg-blue-100 text-blue-800' :
+                                campaign.category === 'reachify' ? 'bg-green-100 text-green-800' :
+                                'bg-purple-100 text-purple-800'
+                              }`}>
+                                {campaign.category}
+                              </span>
+                            </td>
+                            <td className="py-4 px-2">
+                              <div className="text-sm font-medium text-slate-800">
+                                {analytics?.leads_count?.toLocaleString() || 0}
+                              </div>
+                            </td>
+                            <td className="py-4 px-2">
+                              <div className="text-sm font-medium text-slate-800">
+                                {analytics?.emails_sent_count?.toLocaleString() || 0}
+                              </div>
+                            </td>
+                            <td className="py-4 px-2">
+                              <div className="text-sm font-medium text-slate-800">
+                                {analytics?.reply_count?.toLocaleString() || 0}
+                              </div>
+                              <div className="text-xs text-slate-500">({campaignReplyRate.toFixed(1)}%)</div>
+                            </td>
+                            <td className="py-4 px-2">
+                              <div className="text-sm font-medium text-slate-800">
+                                {analytics?.open_count?.toLocaleString() || 0}
+                              </div>
+                            </td>
+                          </tr>
+                          {isExpanded && (
+                            <tr key={`${campaign.id}-details`}>
+                              <td colSpan={7} className="px-2 py-0">
+                                <div className="bg-slate-50/50 rounded-lg p-6 my-4">
+                                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    {/* Campaign Breakdown */}
+                                    <div>
+                                      <h4 className="text-lg font-semibold text-slate-800 mb-4">Campaign Breakdown</h4>
+                                      <CampaignBreakdown 
+                                        campaignId={campaign.campaignId.replace(/^(roger|reachify|prusa)-/, '')} 
+                                        workspaceId={campaign.workspaceId} 
+                                        dateRange="30" 
+                                      />
+                                    </div>
+                                    {/* Campaign Messages */}
+                                    <div>
+                                      <h4 className="text-lg font-semibold text-slate-800 mb-4">Campaign Messages</h4>
+                                      <div className="bg-white rounded-lg p-4 border border-slate-200">
+                                        <CampaignMessages 
+                                          campaignId={campaign.campaignId.replace(/^(roger|reachify|prusa)-/, '')}
+                                          workspaceId={campaign.workspaceId}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </>
                       )
                     })}
                   </tbody>
