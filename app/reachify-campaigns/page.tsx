@@ -37,7 +37,12 @@ export default function ReachifyCampaignsPage() {
     storedUserData.email === 'adimstuff@gmail.com'
   )
   
-  console.log('🚨 EMERGENCY ADMIN CHECK (REACHIFY):', { isEmergencyAdmin, storedUser: storedUser ? 'exists' : 'none' })
+  console.log('🚨 EMERGENCY ADMIN CHECK (REACHIFY):', { 
+    isEmergencyAdmin, 
+    storedUser: storedUser ? 'exists' : 'none',
+    storedEmail: storedUserData?.email,
+    storedUserData: storedUserData
+  })
 
   useEffect(() => {
     console.log('🔍 First useEffect - Auth check (REACHIFY):', { user: user?.email, loading, isAdminAuth, isEmergencyAdmin })

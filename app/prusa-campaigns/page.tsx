@@ -37,7 +37,12 @@ export default function PrusaCampaignsPage() {
     storedUserData.email === 'adimstuff@gmail.com'
   )
   
-  console.log('🚨 EMERGENCY ADMIN CHECK (PRUSA):', { isEmergencyAdmin, storedUser: storedUser ? 'exists' : 'none' })
+  console.log('🚨 EMERGENCY ADMIN CHECK (PRUSA):', { 
+    isEmergencyAdmin, 
+    storedUser: storedUser ? 'exists' : 'none',
+    storedEmail: storedUserData?.email,
+    storedUserData: storedUserData
+  })
 
   useEffect(() => {
     console.log('🔍 First useEffect - Auth check (PRUSA):', { user: user?.email, loading, isAdminAuth, isEmergencyAdmin })

@@ -40,7 +40,8 @@ export default function RogerCampaignsPage() {
   console.log('🚨 EMERGENCY ADMIN CHECK:', { 
     isEmergencyAdmin, 
     storedUser: storedUser ? 'exists' : 'none',
-    storedEmail: storedUserData?.email 
+    storedEmail: storedUserData?.email,
+    storedUserData: storedUserData
   })
 
   useEffect(() => {

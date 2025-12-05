@@ -96,17 +96,8 @@ export async function GET(request: NextRequest) {
           if (prusaResponse.ok) {
             const prusaData = await prusaResponse.json()
             
-            // Filter to only show specific PRUSA campaigns
-            const allowedPrusaCampaigns = [
-              'Candytrail Past Compass',
-              'PRUSA external company 7.9M+',
-              'PRUSA New Compass Leads',
-              'PRUSA Compass 7.9M+',
-              'PRUSA Target Company 7.9M+'
-            ]
-            
+            // Show all PRUSA campaigns (removed filtering)
             const prusaCampaigns = prusaData
-              .filter((campaign: any) => allowedPrusaCampaigns.includes(campaign.campaign_name))
               .map((campaign: any) => ({
                 id: `prusa-${campaign.campaign_id}`,
                 name: campaign.campaign_name,
