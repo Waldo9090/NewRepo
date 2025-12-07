@@ -333,10 +333,10 @@ export function UnifiedCampaignsDashboard({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-500 mx-auto mb-4" />
-          <p className="text-slate-600">Loading unified campaigns...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-slate-500 dark:text-slate-400 mx-auto mb-4" />
+          <p className="text-slate-600 dark:text-slate-300">Loading unified campaigns...</p>
         </div>
       </div>
     )
@@ -347,22 +347,18 @@ export function UnifiedCampaignsDashboard({
       {/* Header with Campaign Selection */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">{title}</h1>
-          <p className="text-slate-600">
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100">{title}</h1>
+          <p className="text-slate-600 dark:text-slate-300">
             {selectedCampaigns.length} of {campaigns.length} campaigns selected
           </p>
         </div>
         
-        {/* Debug info for Admin Button */}
-        <div className="text-xs bg-red-50 p-2 rounded border">
-          Admin Check: user={user?.email}, stored={storedUserData?.email}, isAdmin={isAdmin.toString()}
-        </div>
         
         {isAdmin && (
           <Button
             onClick={() => setShowCampaignSelector(!showCampaignSelector)}
             variant="outline"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
           >
             <Settings className="w-4 h-4" />
             Select Campaigns
@@ -370,32 +366,27 @@ export function UnifiedCampaignsDashboard({
           </Button>
         )}
         
-        {!isAdmin && (
-          <div className="text-xs text-red-600 bg-red-50 p-2 rounded border">
-            ❌ Not admin - Select Campaigns button hidden
-          </div>
-        )}
       </div>
 
       {/* Campaign Selection Panel */}
       {isAdmin && showCampaignSelector && (
-        <Card className="p-6">
+        <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Campaign Selection</h3>
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Campaign Selection</h3>
             <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline" onClick={selectAllCampaigns}>
+              <Button size="sm" variant="outline" onClick={selectAllCampaigns} className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700">
                 Select All
               </Button>
-              <Button size="sm" variant="outline" onClick={deselectAllCampaigns}>
+              <Button size="sm" variant="outline" onClick={deselectAllCampaigns} className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700">
                 Deselect All
               </Button>
-              <Button size="sm" variant="outline" onClick={() => selectCategoryOnly('roger')}>
+              <Button size="sm" variant="outline" onClick={() => selectCategoryOnly('roger')} className="border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-900/30">
                 Roger Only
               </Button>
-              <Button size="sm" variant="outline" onClick={() => selectCategoryOnly('reachify')}>
+              <Button size="sm" variant="outline" onClick={() => selectCategoryOnly('reachify')} className="border-green-300 dark:border-green-600 text-green-700 dark:text-green-200 hover:bg-green-50 dark:hover:bg-green-900/30">
                 Reachify Only
               </Button>
-              <Button size="sm" variant="outline" onClick={() => selectCategoryOnly('prusa')}>
+              <Button size="sm" variant="outline" onClick={() => selectCategoryOnly('prusa')} className="border-purple-300 dark:border-purple-600 text-purple-700 dark:text-purple-200 hover:bg-purple-50 dark:hover:bg-purple-900/30">
                 PRUSA Only
               </Button>
             </div>
@@ -403,14 +394,14 @@ export function UnifiedCampaignsDashboard({
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-80 overflow-y-auto">
             {campaigns.map(campaign => (
-              <div key={campaign.id} className="flex items-center space-x-3 p-3 border rounded">
+              <div key={campaign.id} className="flex items-center space-x-3 p-3 border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-800">
                 <Checkbox
                   checked={campaign.selected}
                   onCheckedChange={() => toggleCampaignSelection(campaign.id)}
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm truncate">{campaign.name}</div>
-                  <div className="text-xs text-gray-500 capitalize">
+                  <div className="font-medium text-sm truncate text-slate-800 dark:text-slate-100">{campaign.name}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 capitalize">
                     {campaign.category} • {campaign.workspaceName}
                   </div>
                 </div>
@@ -420,9 +411,9 @@ export function UnifiedCampaignsDashboard({
           
           {/* Save Button */}
           {isAdmin && hasUnsavedChanges && (
-            <div className="mt-6 pt-4 border-t border-slate-200 bg-blue-50 -mx-6 -mb-6 px-6 pb-6 rounded-b-lg">
+            <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700 bg-blue-50 dark:bg-blue-900/20 -mx-6 -mb-6 px-6 pb-6 rounded-b-lg">
               <div className="flex items-center justify-between">
-                <div className="text-sm text-slate-700 font-medium">
+                <div className="text-sm text-slate-700 dark:text-slate-200 font-medium">
                   ⚠️ You have unsaved changes to <span className="capitalize font-bold">{defaultCategory}</span> campaign selections.
                 </div>
                 <Button 
@@ -444,12 +435,6 @@ export function UnifiedCampaignsDashboard({
             </div>
           )}
 
-          {/* Debug Info (remove after testing) */}
-          {isAdmin && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
-              Debug: Admin={isAdmin.toString()}, HasChanges={hasUnsavedChanges.toString()}, Category={defaultCategory}
-            </div>
-          )}
         </Card>
       )}
 
@@ -459,8 +444,8 @@ export function UnifiedCampaignsDashboard({
           onClick={() => setActiveTab('analytics')}
           className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 ${
             activeTab === 'analytics'
-              ? "border-indigo-500 text-indigo-600"
-              : "border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"
+              ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
+              : "border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:border-slate-300 dark:hover:border-slate-600"
           }`}
         >
           <BarChart3 className="w-4 h-4" />
@@ -470,8 +455,8 @@ export function UnifiedCampaignsDashboard({
           onClick={() => setActiveTab('inbox')}
           className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 ${
             activeTab === 'inbox'
-              ? "border-indigo-500 text-indigo-600"
-              : "border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"
+              ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
+              : "border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:border-slate-300 dark:hover:border-slate-600"
           }`}
         >
           <Inbox className="w-4 h-4" />
@@ -481,8 +466,8 @@ export function UnifiedCampaignsDashboard({
           onClick={() => setActiveTab('emails')}
           className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 ${
             activeTab === 'emails'
-              ? "border-indigo-500 text-indigo-600"
-              : "border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"
+              ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
+              : "border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:border-slate-300 dark:hover:border-slate-600"
           }`}
         >
           <FileText className="w-4 h-4" />
@@ -492,8 +477,8 @@ export function UnifiedCampaignsDashboard({
           onClick={() => setActiveTab('mailboxes')}
           className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 ${
             activeTab === 'mailboxes'
-              ? "border-indigo-500 text-indigo-600"
-              : "border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"
+              ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
+              : "border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:border-slate-300 dark:hover:border-slate-600"
           }`}
         >
           <Mail className="w-4 h-4" />
@@ -519,94 +504,94 @@ export function UnifiedCampaignsDashboard({
         <div className="space-y-8">
           {/* Performance Overview */}
           <div>
-            <h2 className="text-2xl font-bold text-slate-800 mb-6">Performance Overview</h2>
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-6">Performance Overview</h2>
             
             {/* Metrics Cards */}
             <div className="grid grid-cols-5 gap-6 mb-8">
               {/* Sourced */}
-              <Card className="p-6 bg-white border-slate-200 shadow-sm">
+              <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <Users className="w-5 h-5 text-slate-600" />
-                  <span className="text-sm font-medium text-slate-600">Sourced</span>
+                  <Users className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Sourced</span>
                 </div>
-                <div className="text-3xl font-bold text-slate-800 mb-2">
+                <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                   {validatedTotals.leads_count.toLocaleString()}
                 </div>
-                <div className="text-sm text-slate-500">
+                <div className="text-sm text-slate-500 dark:text-slate-400">
                   From {selectedCampaigns.length} campaigns
                 </div>
               </Card>
 
               {/* Emails Sent */}
-              <Card className="p-6 bg-white border-slate-200 shadow-sm">
+              <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <Mail className="w-5 h-5 text-slate-600" />
-                  <span className="text-sm font-medium text-slate-600">Emails Sent</span>
+                  <Mail className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Emails Sent</span>
                 </div>
-                <div className="text-3xl font-bold text-slate-800 mb-2">
+                <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                   {validatedTotals.emails_sent_count.toLocaleString()}
                 </div>
               </Card>
 
               {/* Replies */}
-              <Card className="p-6 bg-white border-slate-200 shadow-sm">
+              <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <TrendingUp className="w-5 h-5 text-slate-600" />
-                  <span className="text-sm font-medium text-slate-600">Replies</span>
+                  <TrendingUp className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Replies</span>
                 </div>
-                <div className="text-3xl font-bold text-slate-800 mb-2">
+                <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                   {validatedTotals.reply_count.toLocaleString()}
                 </div>
-                <div className="text-sm text-slate-500">
+                <div className="text-sm text-slate-500 dark:text-slate-400">
                   ({replyRate.toFixed(1)}%)
                 </div>
               </Card>
 
               {/* Opens */}
-              <Card className="p-6 bg-white border-slate-200 shadow-sm">
+              <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <Mail className="w-5 h-5 text-slate-600" />
-                  <span className="text-sm font-medium text-slate-600">Opens</span>
+                  <Mail className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Opens</span>
                 </div>
-                <div className="text-3xl font-bold text-slate-800 mb-2">
+                <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                   {validatedTotals.open_count.toLocaleString()}
                 </div>
               </Card>
 
               {/* Opportunities */}
-              <Card className="p-6 bg-white border-slate-200 shadow-sm">
+              <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
                   <Calendar className="w-5 h-5 text-slate-600" />
                   <span className="text-sm font-medium text-slate-600">Opportunities</span>
                 </div>
-                <div className="text-3xl font-bold text-slate-800 mb-2">
+                <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                   {validatedTotals.total_opportunities.toLocaleString()}
                 </div>
-                <div className="text-sm text-slate-500">
+                <div className="text-sm text-slate-500 dark:text-slate-400">
                   ${validatedTotals.total_opportunity_value.toLocaleString()}
                 </div>
               </Card>
             </div>
 
             {/* Selected Campaigns Table */}
-            <Card className="p-6 mt-8">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">
+            <Card className="p-6 mt-8 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">
                 Selected Campaigns ({selectedCampaigns.length})
               </h3>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-slate-200">
-                      <th className="text-left py-3 px-2 font-medium text-slate-600 text-sm w-8"></th>
-                      <th className="text-left py-3 px-2 font-medium text-slate-600 text-sm">Campaign</th>
-                      <th className="text-left py-3 px-2 font-medium text-slate-600 text-sm">Category</th>
-                      <th className="text-left py-3 px-2 font-medium text-slate-600 text-sm">Sourced</th>
-                      <th className="text-left py-3 px-2 font-medium text-slate-600 text-sm">Emails Sent</th>
-                      <th className="text-left py-3 px-2 font-medium text-slate-600 text-sm">Replies</th>
-                      <th className="text-left py-3 px-2 font-medium text-slate-600 text-sm">Opens</th>
+                    <tr className="border-b border-slate-200 dark:border-slate-700">
+                      <th className="text-left py-3 px-2 font-medium text-slate-600 dark:text-slate-300 text-sm w-8"></th>
+                      <th className="text-left py-3 px-2 font-medium text-slate-600 dark:text-slate-300 text-sm">Campaign</th>
+                      <th className="text-left py-3 px-2 font-medium text-slate-600 dark:text-slate-300 text-sm">Category</th>
+                      <th className="text-left py-3 px-2 font-medium text-slate-600 dark:text-slate-300 text-sm">Sourced</th>
+                      <th className="text-left py-3 px-2 font-medium text-slate-600 dark:text-slate-300 text-sm">Emails Sent</th>
+                      <th className="text-left py-3 px-2 font-medium text-slate-600 dark:text-slate-300 text-sm">Replies</th>
+                      <th className="text-left py-3 px-2 font-medium text-slate-600 dark:text-slate-300 text-sm">Opens</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                     {selectedCampaigns.map((campaign) => {
                       const analytics = campaign.analytics
                       const campaignReplyRate = analytics?.emails_sent_count > 0 
@@ -616,49 +601,49 @@ export function UnifiedCampaignsDashboard({
                       
                       return (
                         <>
-                          <tr key={campaign.id} className="hover:bg-slate-50/50 transition-colors">
+                          <tr key={campaign.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                             <td className="py-4 px-2">
                               <button
                                 onClick={() => toggleExpandedCampaign(campaign.campaignId)}
-                                className="p-1 hover:bg-slate-200 rounded transition-colors"
+                                className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors"
                               >
                                 {isExpanded ? (
-                                  <ChevronDown className="w-4 h-4 text-slate-600" />
+                                  <ChevronDown className="w-4 h-4 text-slate-600 dark:text-slate-300" />
                                 ) : (
-                                  <ChevronRight className="w-4 h-4 text-slate-600" />
+                                  <ChevronRight className="w-4 h-4 text-slate-600 dark:text-slate-300" />
                                 )}
                               </button>
                             </td>
                             <td className="py-4 px-2">
-                              <div className="font-medium text-slate-800 text-sm">{campaign.name}</div>
+                              <div className="font-medium text-slate-800 dark:text-slate-200 text-sm">{campaign.name}</div>
                             </td>
                             <td className="py-4 px-2">
                               <span className={`text-xs px-2 py-1 rounded-full capitalize ${
-                                campaign.category === 'roger' ? 'bg-blue-100 text-blue-800' :
-                                campaign.category === 'reachify' ? 'bg-green-100 text-green-800' :
-                                'bg-purple-100 text-purple-800'
+                                campaign.category === 'roger' ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300' :
+                                campaign.category === 'reachify' ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300' :
+                                'bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-300'
                               }`}>
                                 {campaign.category}
                               </span>
                             </td>
                             <td className="py-4 px-2">
-                              <div className="text-sm font-medium text-slate-800">
+                              <div className="text-sm font-medium text-slate-800 dark:text-slate-200">
                                 {analytics?.leads_count?.toLocaleString() || 0}
                               </div>
                             </td>
                             <td className="py-4 px-2">
-                              <div className="text-sm font-medium text-slate-800">
+                              <div className="text-sm font-medium text-slate-800 dark:text-slate-200">
                                 {analytics?.emails_sent_count?.toLocaleString() || 0}
                               </div>
                             </td>
                             <td className="py-4 px-2">
-                              <div className="text-sm font-medium text-slate-800">
+                              <div className="text-sm font-medium text-slate-800 dark:text-slate-200">
                                 {analytics?.reply_count?.toLocaleString() || 0}
                               </div>
-                              <div className="text-xs text-slate-500">({campaignReplyRate.toFixed(1)}%)</div>
+                              <div className="text-xs text-slate-500 dark:text-slate-400">({campaignReplyRate.toFixed(1)}%)</div>
                             </td>
                             <td className="py-4 px-2">
-                              <div className="text-sm font-medium text-slate-800">
+                              <div className="text-sm font-medium text-slate-800 dark:text-slate-200">
                                 {analytics?.open_count?.toLocaleString() || 0}
                               </div>
                             </td>
@@ -666,11 +651,11 @@ export function UnifiedCampaignsDashboard({
                           {isExpanded && (
                             <tr key={`${campaign.id}-details`}>
                               <td colSpan={7} className="px-2 py-0">
-                                <div className="bg-slate-50/50 rounded-lg p-6 my-4">
+                                <div className="bg-slate-50/50 dark:bg-slate-800/50 rounded-lg p-6 my-4">
                                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     {/* Campaign Breakdown */}
                                     <div>
-                                      <h4 className="text-lg font-semibold text-slate-800 mb-4">Campaign Breakdown</h4>
+                                      <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">Campaign Breakdown</h4>
                                       <CampaignBreakdown 
                                         campaignId={campaign.campaignId.replace(/^(roger|reachify|prusa)-/, '')} 
                                         workspaceId={campaign.workspaceId} 
@@ -679,8 +664,8 @@ export function UnifiedCampaignsDashboard({
                                     </div>
                                     {/* Campaign Messages */}
                                     <div>
-                                      <h4 className="text-lg font-semibold text-slate-800 mb-4">Campaign Messages</h4>
-                                      <div className="bg-white rounded-lg p-4 border border-slate-200">
+                                      <h4 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">Campaign Messages</h4>
+                                      <div className="bg-white dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
                                         <CampaignMessages 
                                           campaignId={campaign.campaignId.replace(/^(roger|reachify|prusa)-/, '')}
                                           workspaceId={campaign.workspaceId}

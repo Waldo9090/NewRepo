@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
@@ -26,11 +27,13 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className="font-poppins">
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
+      <body className="font-poppins bg-white dark:bg-slate-950 transition-colors duration-200">
+        <ThemeProvider>
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
+        </ThemeProvider>
         <Analytics mode={process.env.NODE_ENV === 'development' ? 'development' : 'production'} />
       </body>
     </html>

@@ -108,10 +108,10 @@ export function EmailFrameworks({ category = 'all' }: EmailFrameworksProps) {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'roger': return 'bg-blue-100 text-blue-800'
-      case 'reachify': return 'bg-green-100 text-green-800'
-      case 'prusa': return 'bg-purple-100 text-purple-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'roger': return 'bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300'
+      case 'reachify': return 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300'
+      case 'prusa': return 'bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-300'
+      default: return 'bg-gray-100 dark:bg-gray-800/50 text-gray-800 dark:text-gray-300'
     }
   }
 
@@ -119,8 +119,8 @@ export function EmailFrameworks({ category = 'all' }: EmailFrameworksProps) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-500 mx-auto mb-4" />
-          <p className="text-slate-600">Loading email frameworks...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-slate-500 dark:text-slate-400 mx-auto mb-4" />
+          <p className="text-slate-600 dark:text-slate-300">Loading email frameworks...</p>
         </div>
       </div>
     )
@@ -131,8 +131,8 @@ export function EmailFrameworks({ category = 'all' }: EmailFrameworksProps) {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Email Frameworks</h2>
-          <p className="text-slate-600">
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Email Frameworks</h2>
+          <p className="text-slate-600 dark:text-slate-300">
             Viewing {filteredTemplates.length} of {emailTemplates.length} email templates
             {category !== 'all' && ` from ${category} campaigns`}
           </p>
@@ -165,11 +165,11 @@ export function EmailFrameworks({ category = 'all' }: EmailFrameworksProps) {
 
       {/* Search Panel */}
       {showFilters && (
-        <Card className="p-4">
+        <Card className="p-4 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
           <div className="flex-1">
-            <label className="block text-sm font-medium text-slate-700 mb-2">Search Templates</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Search Templates</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500 w-4 h-4" />
               <Input
                 placeholder="Search by subject, campaign, step, body content..."
                 value={searchTerm}
@@ -184,15 +184,15 @@ export function EmailFrameworks({ category = 'all' }: EmailFrameworksProps) {
       {/* Email Templates */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Templates List Panel */}
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+        <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
             <FileText className="w-5 h-5" />
             Email Templates ({filteredTemplates.length})
           </h3>
           
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {filteredTemplates.length === 0 ? (
-              <div className="text-center py-8 text-slate-500">
+              <div className="text-center py-8 text-slate-500 dark:text-slate-400">
                 <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>No email templates found</p>
                 {searchTerm && <p className="text-sm">Try adjusting your search terms</p>}
@@ -203,18 +203,18 @@ export function EmailFrameworks({ category = 'all' }: EmailFrameworksProps) {
                   key={template.id}
                   onClick={() => setSelectedTemplate(template)}
                   className={`p-3 border rounded-lg cursor-pointer transition-all hover:shadow-sm ${
-                    selectedTemplate?.id === template.id ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'
+                    selectedTemplate?.id === template.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm text-slate-800 truncate">
+                      <div className="font-medium text-sm text-slate-800 dark:text-slate-200 truncate">
                         {template.subject || 'No Subject'}
                       </div>
-                      <div className="text-xs text-slate-500 truncate">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
                         {template.step_name} • {template.variant_name}
                       </div>
-                      <div className="text-xs text-slate-400 mt-1 line-clamp-2">
+                      <div className="text-xs text-slate-400 dark:text-slate-500 mt-1 line-clamp-2">
                         {htmlToPlainText(template.body || '').substring(0, 100)}
                         {htmlToPlainText(template.body || '').length > 100 ? '...' : ''}
                       </div>
@@ -224,8 +224,8 @@ export function EmailFrameworks({ category = 'all' }: EmailFrameworksProps) {
                         {template.category}
                       </span>
                       <div className="flex items-center gap-1">
-                        <Layers className="w-3 h-3 text-slate-400" />
-                        <span className="text-xs text-slate-500">
+                        <Layers className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
                           Seq {template.sequenceIndex}.{template.stepIndex}
                         </span>
                       </div>
@@ -247,35 +247,35 @@ export function EmailFrameworks({ category = 'all' }: EmailFrameworksProps) {
         </Card>
 
         {/* Template Preview Panel */}
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-slate-800 mb-4">Email Template Preview</h3>
+        <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">Email Template Preview</h3>
           
           {selectedTemplate ? (
             <div className="space-y-4">
               {/* Template Header */}
-              <div className="pb-4 border-b border-slate-200">
+              <div className="pb-4 border-b border-slate-200 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-2">
                   <span className={`text-xs px-2 py-1 rounded-full capitalize ${getCategoryColor(selectedTemplate.category)}`}>
                     {selectedTemplate.category}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">
+                    <span className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300">
                       Template
                     </span>
                     <div className="flex items-center gap-1">
-                      <Layers className="w-3 h-3 text-slate-400" />
-                      <span className="text-xs text-slate-500">
+                      <Layers className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
                         Sequence {selectedTemplate.sequenceIndex} • Step {selectedTemplate.stepIndex} • Variant {selectedTemplate.variantIndex}
                       </span>
                     </div>
                   </div>
                 </div>
                 
-                <h4 className="font-semibold text-slate-800 mb-2">
+                <h4 className="font-semibold text-slate-800 dark:text-slate-100 mb-2">
                   {selectedTemplate.subject || 'No Subject'}
                 </h4>
                 
-                <div className="space-y-1 text-sm text-slate-600">
+                <div className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
                   <div><strong>Campaign:</strong> {selectedTemplate.campaignName}</div>
                   <div><strong>Subsequence:</strong> {selectedTemplate.subsequenceName}</div>
                   <div><strong>Step:</strong> {selectedTemplate.step_name}</div>
@@ -286,10 +286,10 @@ export function EmailFrameworks({ category = 'all' }: EmailFrameworksProps) {
 
               {/* Template Body */}
               <div className="max-h-80 overflow-y-auto">
-                <h5 className="font-medium text-slate-700 mb-3">Email Body:</h5>
-                <div className="bg-slate-50 p-4 rounded-lg">
+                <h5 className="font-medium text-slate-700 dark:text-slate-300 mb-3">Email Body:</h5>
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
                   <div 
-                    className="text-slate-700 text-sm leading-relaxed prose prose-sm max-w-none [&_div]:mb-2 [&_br]:block [&_br]:my-1 [&_a]:text-blue-600 [&_a]:underline [&_p]:mb-3"
+                    className="text-slate-700 dark:text-slate-200 text-sm leading-relaxed prose prose-sm max-w-none [&_div]:mb-2 [&_br]:block [&_br]:my-1 [&_a]:text-blue-600 dark:[&_a]:text-blue-400 [&_a]:underline [&_p]:mb-3"
                     dangerouslySetInnerHTML={{ 
                       __html: selectedTemplate.body || 'No content available' 
                     }}
@@ -301,7 +301,7 @@ export function EmailFrameworks({ category = 'all' }: EmailFrameworksProps) {
               </div>
             </div>
           ) : (
-            <div className="text-center py-12 text-slate-500">
+            <div className="text-center py-12 text-slate-500 dark:text-slate-400">
               <FileText className="w-16 h-16 mx-auto mb-4 opacity-30" />
               <p className="text-lg font-medium mb-2">Select an Email Template</p>
               <p>Choose a template from the list to preview its content and structure</p>
@@ -312,26 +312,26 @@ export function EmailFrameworks({ category = 'all' }: EmailFrameworksProps) {
 
       {/* Templates Summary */}
       {filteredTemplates.length > 0 && (
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold text-slate-800 mb-4">Templates Summary</h3>
+        <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
+          <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">Templates Summary</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-slate-800">
+              <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                 {filteredTemplates.length}
               </div>
-              <div className="text-sm text-slate-600">Email Templates</div>
+              <div className="text-sm text-slate-600 dark:text-slate-300">Email Templates</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-slate-800">
+              <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                 {new Set(filteredTemplates.map(t => t.campaignId)).size}
               </div>
-              <div className="text-sm text-slate-600">Campaigns</div>
+              <div className="text-sm text-slate-600 dark:text-slate-300">Campaigns</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-slate-800">
+              <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
                 {new Set(filteredTemplates.map(t => t.subsequenceId)).size}
               </div>
-              <div className="text-sm text-slate-600">Subsequences</div>
+              <div className="text-sm text-slate-600 dark:text-slate-300">Subsequences</div>
             </div>
           </div>
         </Card>

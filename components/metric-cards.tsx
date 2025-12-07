@@ -70,7 +70,7 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
           {[...Array(4)].map((_, i) => (
             <Card key={i} className="p-6 bg-white/60 backdrop-blur-sm border-slate-200 shadow-sm">
               <div className="flex items-center justify-center h-20">
-                <Loader2 className="w-6 h-6 animate-spin text-slate-500" />
+                <Loader2 className="w-6 h-6 animate-spin text-slate-500 dark:text-slate-400" />
               </div>
             </Card>
           ))}
@@ -94,10 +94,10 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
     return (
       <div className="mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          <Card className="p-8 bg-white/60 backdrop-blur-sm border-slate-200 shadow-sm col-span-full">
-            <div className="text-center text-slate-600">
+          <Card className="p-8 bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-sm col-span-full">
+            <div className="text-center text-slate-600 dark:text-slate-300">
               <p className="text-sm font-medium">Unable to load analytics data</p>
-              <p className="text-xs mt-2 text-slate-500">{error}</p>
+              <p className="text-xs mt-2 text-slate-500 dark:text-slate-400">{error}</p>
               <p className="text-xs mt-3 text-indigo-600 font-medium">
                 Check browser console for detailed error information
               </p>
@@ -123,10 +123,10 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
     return (
       <div className="mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          <Card className="p-8 bg-white/60 backdrop-blur-sm border-slate-200 shadow-sm col-span-full">
-            <div className="text-center text-slate-600">
+          <Card className="p-8 bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-sm col-span-full">
+            <div className="text-center text-slate-600 dark:text-slate-300">
               <p className="text-sm font-medium">No analytics data available</p>
-              <p className="text-xs mt-2 text-slate-500">Make sure you have active campaigns</p>
+              <p className="text-xs mt-2 text-slate-500 dark:text-slate-400">Make sure you have active campaigns</p>
             </div>
           </Card>
         </div>
@@ -160,7 +160,7 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         {/* Emails Opened Card */}
         {showMetrics.emailsOpened && (
-          <Card className="p-6 bg-green-50/30 border-green-100 shadow-sm">
+          <Card className="p-6 bg-green-50/30 dark:bg-green-900/20 border-green-100 dark:border-green-800 shadow-sm">
         <div className="flex items-start justify-between mb-4">
           <h3 className="text-sm font-medium text-muted-foreground">Emails Opened</h3>
           <Mail className="w-4 h-4 text-green-500" />
@@ -176,7 +176,7 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
 
         {/* Total Leads in List Card */}
         {showMetrics.totalLeads && (
-          <Card className="p-6 bg-blue-50/30 border-blue-100 shadow-sm">
+          <Card className="p-6 bg-blue-50/30 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800 shadow-sm">
         <div className="flex items-start justify-between mb-4">
           <h3 className="text-sm font-medium text-muted-foreground">Total Leads</h3>
           <Users className="w-4 h-4 text-blue-500" />
@@ -194,7 +194,7 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
 
         {/* Open Rate Card */}
         {showMetrics.openRate && (
-          <Card className="p-6 bg-indigo-50/30 border-indigo-100 shadow-sm">
+          <Card className="p-6 bg-indigo-50/30 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-800 shadow-sm">
         <div className="flex items-start justify-between mb-4">
           <h3 className="text-sm font-medium text-muted-foreground">Open Rate</h3>
           <Eye className="w-4 h-4 text-indigo-500" />
@@ -212,7 +212,7 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
 
         {/* Reply Rate Card */}
         {showMetrics.replyRate && (
-          <Card className="p-6 bg-purple-50/30 border-purple-100 shadow-sm">
+          <Card className="p-6 bg-purple-50/30 dark:bg-purple-900/20 border-purple-100 dark:border-purple-800 shadow-sm">
         <div className="flex items-start justify-between mb-4">
           <h3 className="text-sm font-medium text-muted-foreground">Reply Rate</h3>
           <MessageCircle className="w-4 h-4 text-purple-500" />
@@ -233,7 +233,7 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
       <div className="flex justify-center mb-2">
         <button
           onClick={() => setShowCheckboxBar(!showCheckboxBar)}
-          className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+          className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
         >
           {showCheckboxBar ? (
             <ChevronDown className="w-4 h-4" />
@@ -255,7 +255,7 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
                 onChange={() => toggleMetric('emailsOpened')}
                 className="rounded border-slate-300 text-green-600 shadow-sm focus:border-green-500 focus:ring-green-500"
               />
-              <span className="text-sm text-slate-600">1</span>
+              <span className="text-sm text-slate-600 dark:text-slate-300">1</span>
             </label>
             
             <label className="flex items-center gap-2 cursor-pointer">
@@ -265,7 +265,7 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
                 onChange={() => toggleMetric('totalLeads')}
                 className="rounded border-slate-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
-              <span className="text-sm text-slate-600">2</span>
+              <span className="text-sm text-slate-600 dark:text-slate-300">2</span>
             </label>
             
             <label className="flex items-center gap-2 cursor-pointer">
@@ -275,7 +275,7 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
                 onChange={() => toggleMetric('openRate')}
                 className="rounded border-slate-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               />
-              <span className="text-sm text-slate-600">3</span>
+              <span className="text-sm text-slate-600 dark:text-slate-300">3</span>
             </label>
             
             <label className="flex items-center gap-2 cursor-pointer">
@@ -285,7 +285,7 @@ export function MetricCards({ campaignId, workspaceId, dateRange }: MetricCardsP
                 onChange={() => toggleMetric('replyRate')}
                 className="rounded border-slate-300 text-purple-600 shadow-sm focus:border-purple-500 focus:ring-purple-500"
               />
-              <span className="text-sm text-slate-600">4</span>
+              <span className="text-sm text-slate-600 dark:text-slate-300">4</span>
             </label>
           </div>
         </div>

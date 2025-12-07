@@ -47,10 +47,10 @@ export default function DashboardPage() {
   // Show loading until client-side hydration is complete
   if (!isClient || (loading && !isAdminAuth)) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-500 mx-auto mb-4" />
-          <p className="text-slate-600">Loading dashboard...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-slate-500 dark:text-slate-400 mx-auto mb-4" />
+          <p className="text-slate-600 dark:text-slate-300">Loading dashboard...</p>
         </div>
       </div>
     )

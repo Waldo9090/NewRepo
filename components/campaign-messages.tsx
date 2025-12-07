@@ -159,8 +159,8 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-500 mx-auto mb-4" />
-          <p className="text-slate-600">Loading campaign messages...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-slate-500 dark:text-slate-400 mx-auto mb-4" />
+          <p className="text-slate-600 dark:text-slate-300">Loading campaign messages...</p>
         </div>
       </div>
     )
@@ -181,9 +181,9 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
   if (!campaignData || !campaignData.sequences || campaignData.sequences.length === 0) {
     return (
       <div className="text-center py-12">
-        <Mail className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-        <h3 className="text-lg font-medium text-slate-800 mb-2">No Messages Found</h3>
-        <p className="text-sm text-slate-600">
+        <Mail className="w-16 h-16 mx-auto mb-4 text-slate-300 dark:text-slate-600" />
+        <h3 className="text-lg font-medium text-slate-800 dark:text-slate-100 mb-2">No Messages Found</h3>
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           This campaign doesn't have any email sequences configured.
         </p>
       </div>
@@ -205,20 +205,20 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
   return (
     <div className="space-y-6">
       {/* Campaign Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-xl font-semibold text-slate-800">{campaignData.name}</h3>
-            <p className="text-sm text-slate-600 mt-1">Email Sequence Messages</p>
+            <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100">{campaignData.name}</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">Email Sequence Messages</p>
           </div>
           <Badge 
             variant={campaignData.status === 1 ? "default" : "secondary"}
-            className={campaignData.status === 1 ? "bg-green-100 text-green-800" : ""}
+            className={campaignData.status === 1 ? "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300" : ""}
           >
             {statusLabels[campaignData.status as keyof typeof statusLabels] || 'Unknown'}
           </Badge>
         </div>
-        <div className="text-sm text-slate-600">
+        <div className="text-sm text-slate-600 dark:text-slate-300">
           <span className="font-medium">{sequence.steps.length}</span> email steps in sequence
         </div>
       </div>
@@ -230,18 +230,18 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
           const isExpanded = expandedSteps.has(stepId)
           
           return (
-            <Card key={stepIndex} className="border-slate-200">
+            <Card key={stepIndex} className="border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-semibold text-indigo-700">{stepIndex + 1}</span>
+                    <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">{stepIndex + 1}</span>
                     </div>
                     <div>
-                      <h4 className="font-medium text-slate-800">
+                      <h4 className="font-medium text-slate-800 dark:text-slate-100">
                         Email Step {stepIndex + 1}
                       </h4>
-                      <div className="flex items-center gap-4 text-sm text-slate-500 mt-1">
+                      <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 mt-1">
                         <div className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
                           <span>
@@ -258,7 +258,7 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
                     variant="ghost"
                     size="sm"
                     onClick={() => toggleStepExpansion(stepId)}
-                    className="text-slate-600 hover:text-slate-800"
+                    className="text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100"
                   >
                     {isExpanded ? (
                       <>
@@ -284,7 +284,7 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
                         <div 
                           key={variantIndex} 
                           className={`border rounded-lg p-4 ${
-                            variant.v_disabled ? 'bg-slate-50 border-slate-200' : 'bg-white border-slate-300'
+                            variant.v_disabled ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700' : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600'
                           }`}
                         >
                           <div className="flex items-center justify-between mb-3">
@@ -302,7 +302,7 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
                               variant="ghost"
                               size="sm"
                               onClick={() => copyToClipboard(`Subject: ${variant.subject}\n\n${formatEmailBody(variant.body)}`, variantId)}
-                              className="text-slate-500 hover:text-slate-700 text-xs px-2 py-1 h-auto"
+                              className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 text-xs px-2 py-1 h-auto"
                             >
                               <Copy className="w-3 h-3 mr-1" />
                               {copiedVariant === variantId ? 'Copied!' : 'Copy'}
@@ -311,20 +311,20 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
 
                           {/* Subject Line */}
                           <div className="mb-4">
-                            <label className="text-xs font-medium text-slate-600 uppercase tracking-wide">
+                            <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide">
                               Subject Line
                             </label>
-                            <div className="mt-1 p-3 bg-slate-50 rounded border text-sm text-slate-800 font-medium">
+                            <div className="mt-1 p-3 bg-slate-50 dark:bg-slate-800/50 rounded border border-slate-200 dark:border-slate-700 text-sm text-slate-800 dark:text-slate-100 font-medium">
                               {variant.subject || 'No subject'}
                             </div>
                           </div>
 
                           {/* Email Body */}
                           <div>
-                            <label className="text-xs font-medium text-slate-600 uppercase tracking-wide">
+                            <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide">
                               Email Body
                             </label>
-                            <div className="mt-1 p-4 bg-slate-50 rounded border text-sm text-slate-700 leading-relaxed">
+                            <div className="mt-1 p-4 bg-slate-50 dark:bg-slate-800/50 rounded border border-slate-200 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
                               <div className="whitespace-pre-wrap font-mono">
                                 {formatEmailBody(variant.body) || 'No content'}
                               </div>
@@ -343,9 +343,9 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
 
       {sequence.steps.length === 0 && (
         <div className="text-center py-12">
-          <Mail className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-          <h3 className="text-lg font-medium text-slate-800 mb-2">No Email Steps</h3>
-          <p className="text-sm text-slate-600">
+          <Mail className="w-16 h-16 mx-auto mb-4 text-slate-300 dark:text-slate-600" />
+          <h3 className="text-lg font-medium text-slate-800 dark:text-slate-100 mb-2">No Email Steps</h3>
+          <p className="text-sm text-slate-600 dark:text-slate-300">
             This campaign sequence doesn't have any email steps configured.
           </p>
         </div>

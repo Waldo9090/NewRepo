@@ -55,8 +55,8 @@ export function FromAddressList({ category }: FromAddressListProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600">Loading from addresses...</span>
+        <Loader2 className="w-6 h-6 animate-spin text-slate-500 dark:text-slate-400" />
+        <span className="ml-2 text-slate-600 dark:text-slate-300">Loading from addresses...</span>
       </div>
     )
   }
@@ -64,8 +64,8 @@ export function FromAddressList({ category }: FromAddressListProps) {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <div className="text-red-600 font-medium mb-2">Error Loading From Addresses</div>
-        <div className="text-red-500 text-sm">{error}</div>
+        <div className="text-red-600 dark:text-red-400 font-medium mb-2">Error Loading From Addresses</div>
+        <div className="text-red-500 dark:text-red-300 text-sm">{error}</div>
       </div>
     )
   }
@@ -73,22 +73,27 @@ export function FromAddressList({ category }: FromAddressListProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Mail className="w-6 h-6 text-gray-600" />
-        <h2 className="text-2xl font-bold text-gray-800">From Address Emails ({fromAddresses.length})</h2>
+        <Mail className="w-6 h-6 text-slate-600 dark:text-slate-300" />
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">From Address Emails ({fromAddresses.length})</h2>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {fromAddresses.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            No from addresses found
+          <div className="text-center py-12">
+            <Mail className="w-16 h-16 mx-auto mb-4 text-slate-300 dark:text-slate-600 opacity-50" />
+            <p className="text-slate-500 dark:text-slate-400 font-medium">No from addresses found</p>
+            <p className="text-sm text-slate-400 dark:text-slate-500 mt-2">Email addresses will appear here once campaigns are active</p>
           </div>
         ) : (
           fromAddresses.map((address, index) => (
             <div 
               key={address}
-              className="p-3 bg-gray-50 rounded border text-gray-800 font-mono text-sm"
+              className="p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow duration-200"
             >
-              {address}
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
+                <span className="text-slate-800 dark:text-slate-100 font-mono text-sm">{address}</span>
+              </div>
             </div>
           ))
         )}

@@ -22,7 +22,7 @@ export function AnalyticsDashboard() {
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>('30')
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+    <div className="flex min-h-screen bg-white dark:bg-slate-950">
       <Sidebar />
 
       <div className="flex-1">
@@ -32,8 +32,8 @@ export function AnalyticsDashboard() {
           {/* Page Header */}
           <div className="mb-8">
             <div className="mb-3">
-              <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Analytics</h1>
-              <p className="text-sm text-slate-600 font-medium">
+              <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Analytics</h1>
+              <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">
                 {selectedCampaignId || selectedWorkspaceId 
                   ? `${selectedCampaignId ? 'Campaign' : ''}${selectedCampaignId && selectedWorkspaceId ? ' & ' : ''}${selectedWorkspaceId ? 'Workspace' : ''}-specific insights` 
                   : 'Comprehensive performance insights'}
@@ -63,7 +63,7 @@ export function AnalyticsDashboard() {
           {/* Active Filters */}
           {(selectedCampaignId || selectedWorkspaceId) && (
             <div className="mb-8">
-              <p className="text-sm text-slate-600 font-medium bg-indigo-50/50 px-4 py-3 rounded-xl border border-indigo-100">
+              <p className="text-sm text-slate-600 dark:text-slate-300 font-medium bg-indigo-50/50 dark:bg-indigo-900/20 px-4 py-3 rounded-xl border border-indigo-100 dark:border-indigo-800">
                 Showing data for {selectedCampaignId && 'selected campaign'}{selectedCampaignId && selectedWorkspaceId && ' and '}{selectedWorkspaceId && 'selected workspace'}
               </p>
             </div>
@@ -78,8 +78,8 @@ export function AnalyticsDashboard() {
               onClick={() => setSelectedTab("charts")}
               className={`flex items-center gap-3 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 selectedTab === "charts"
-                  ? "bg-white shadow-md border border-slate-200 text-slate-800"
-                  : "text-slate-600 hover:text-slate-800 hover:bg-white/50"
+                  ? "bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-800/50"
               }`}
             >
               Charts & Trends
@@ -88,8 +88,8 @@ export function AnalyticsDashboard() {
               onClick={() => setSelectedTab("breakdown")}
               className={`flex items-center gap-3 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 selectedTab === "breakdown"
-                  ? "bg-white shadow-md border border-slate-200 text-slate-800"
-                  : "text-slate-600 hover:text-slate-800 hover:bg-white/50"
+                  ? "bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-800/50"
               }`}
             >
               Campaign Breakdown
@@ -98,8 +98,8 @@ export function AnalyticsDashboard() {
               onClick={() => setSelectedTab("messages")}
               className={`flex items-center gap-3 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 selectedTab === "messages"
-                  ? "bg-white shadow-md border border-slate-200 text-slate-800"
-                  : "text-slate-600 hover:text-slate-800 hover:bg-white/50"
+                  ? "bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-800/50"
               }`}
             >
               <Mail className="w-4 h-4" />
@@ -109,8 +109,8 @@ export function AnalyticsDashboard() {
               onClick={() => setSelectedTab("leads")}
               className={`flex items-center gap-3 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 selectedTab === "leads"
-                  ? "bg-white shadow-md border border-slate-200 text-slate-800"
-                  : "text-slate-600 hover:text-slate-800 hover:bg-white/50"
+                  ? "bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-800/50"
               }`}
             >
               <User className="w-4 h-4" />
@@ -120,8 +120,8 @@ export function AnalyticsDashboard() {
               onClick={() => setSelectedTab("inbox")}
               className={`flex items-center gap-3 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                 selectedTab === "inbox"
-                  ? "bg-white shadow-md border border-slate-200 text-slate-800"
-                  : "text-slate-600 hover:text-slate-800 hover:bg-white/50"
+                  ? "bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
+                  : "text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-800/50"
               }`}
             >
               <Inbox className="w-4 h-4" />

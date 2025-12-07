@@ -22,43 +22,32 @@ function getApiKeyForWorkspace(workspaceId: string | null) {
   }
 }
 
-// All campaigns configuration combined
-const ALL_CAMPAIGNS = [
-  // Roger Campaigns
+// Workspace configuration - now fetch all campaigns dynamically
+const WORKSPACE_CONFIG = [
   {
-    id: 'roger-new-real-estate-leads',
-    name: 'Roger New Real Estate Leads',
-    campaignId: 'd4e3c5ea-2bd6-46c2-9a32-2586cd7d1856',
     workspaceId: '1',
-    workspaceName: 'Wings Over Campaign',
-    category: 'roger'
+    workspaceName: 'Wings Over Campaign', 
+    category: 'roger',
+    apiKeyIndex: '1'
   },
   {
-    id: 'roger-real-estate-offices',
-    name: 'Roger Real Estate Offices', 
-    campaignId: '6ffe8ad9-9695-4f4d-973f-0c20425268eb',
-    workspaceId: '1',
-    workspaceName: 'Wings Over Campaign',
-    category: 'roger'
+    workspaceId: '2', 
+    workspaceName: 'Paramount Realty USA',
+    category: 'prusa',
+    apiKeyIndex: '2'
   },
   {
-    id: 'roger-hospitals-chapel-hill',
-    name: 'Roger Hospitals Chapel Hill',
-    campaignId: 'a59eefd0-0c1a-478d-bb2f-6216798fa757',
-    workspaceId: '1', 
-    workspaceName: 'Wings Over Campaign',
-    category: 'roger'
+    workspaceId: '3',
+    workspaceName: 'Workspace 3',
+    category: 'workspace3', 
+    apiKeyIndex: '3'
   },
-  // Reachify Campaigns
   {
-    id: 'reachify-campaign',
-    name: 'Reachify Campaign',
-    campaignId: '477533b0-ad87-4f25-8a61-a296f384578e',
     workspaceId: '4',
     workspaceName: 'Reachify (5 accounts)',
-    category: 'reachify'
-  },
-  // PRUSA Campaigns - we'll fetch these dynamically
+    category: 'reachify',
+    apiKeyIndex: '4'
+  }
 ]
 
 export async function GET(request: NextRequest) {
@@ -71,49 +60,59 @@ export async function GET(request: NextRequest) {
     
     console.log('Request params:', { startDate, endDate, category })
 
-    let campaignsToFetch = ALL_CAMPAIGNS
+    let campaignsToFetch: any[] = []
 
-    // Filter campaigns by category if specified
-    if (category && category !== 'all') {
-      campaignsToFetch = ALL_CAMPAIGNS.filter(campaign => campaign.category === category)
-    }
+    // Get all campaigns from all workspaces
+    for (const workspace of WORKSPACE_CONFIG) {
+      // Skip if filtering by category and this workspace doesn't match
+      if (category && category !== 'all' && workspace.category !== category) {
+        continue
+      }
 
-    // For PRUSA campaigns, we need to fetch them dynamically
-    if (!category || category === 'all' || category === 'prusa') {
       try {
-        const prusaApiKey = getApiKeyForWorkspace('2')
-        if (prusaApiKey) {
-          const prusaResponse = await fetch(
-            `${INSTANTLY_BASE_URL}/api/v2/campaigns/analytics?${startDate ? `start_date=${startDate}` : ''}${endDate ? `&end_date=${endDate}` : ''}`,
-            {
-              headers: {
-                'Authorization': `Bearer ${prusaApiKey}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          )
+        const apiKey = getApiKeyForWorkspace(workspace.workspaceId)
+        if (!apiKey) {
+          console.warn(`No API key for workspace ${workspace.workspaceId}`)
+          continue
+        }
 
-          if (prusaResponse.ok) {
-            const prusaData = await prusaResponse.json()
-            
-            // Show all PRUSA campaigns (removed filtering)
-            const prusaCampaigns = prusaData
-              .map((campaign: any) => ({
-                id: `prusa-${campaign.campaign_id}`,
-                name: campaign.campaign_name,
-                campaignId: campaign.campaign_id,
-                workspaceId: '2',
-                workspaceName: 'Paramount Realty USA', 
-                category: 'prusa',
-                analytics: campaign
-              }))
-            campaignsToFetch = [...campaignsToFetch, ...prusaCampaigns]
+        const params = new URLSearchParams()
+        if (startDate) params.append('start_date', startDate)
+        if (endDate) params.append('end_date', endDate)
+
+        const response = await fetch(
+          `${INSTANTLY_BASE_URL}/api/v2/campaigns/analytics?${params.toString()}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+            },
           }
+        )
+
+        if (response.ok) {
+          const data = await response.json()
+          
+          // Add all campaigns from this workspace
+          const workspaceCampaigns = data.map((campaign: any) => ({
+            id: `${workspace.category}-${campaign.campaign_id}`,
+            name: campaign.campaign_name,
+            campaignId: campaign.campaign_id,
+            workspaceId: workspace.workspaceId,
+            workspaceName: workspace.workspaceName,
+            category: workspace.category,
+            analytics: campaign
+          }))
+          
+          campaignsToFetch = [...campaignsToFetch, ...workspaceCampaigns]
+        } else {
+          console.warn(`Failed to fetch campaigns for workspace ${workspace.workspaceId}: ${response.status}`)
         }
       } catch (error) {
-        console.warn('Failed to fetch PRUSA campaigns:', error)
+        console.warn(`Error fetching campaigns for workspace ${workspace.workspaceId}:`, error)
       }
     }
+
 
     // Fetch analytics for each campaign
     const analyticsPromises = campaignsToFetch.map(async (campaign) => {

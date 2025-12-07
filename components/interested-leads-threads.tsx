@@ -316,8 +316,8 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600">Loading responding leads...</span>
+        <Loader2 className="w-6 h-6 animate-spin text-slate-500 dark:text-slate-400" />
+        <span className="ml-2 text-slate-600 dark:text-slate-300">Loading responding leads...</span>
       </div>
     )
   }
@@ -325,8 +325,8 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <div className="text-red-600 font-medium mb-2">Error Loading Responding Leads</div>
-        <div className="text-red-500 text-sm mb-4">{error}</div>
+        <div className="text-red-600 dark:text-red-400 font-medium mb-2">Error Loading Responding Leads</div>
+        <div className="text-red-500 dark:text-red-300 text-sm mb-4">{error}</div>
         <Button 
           onClick={() => fetchInterestedLeads()} 
           size="sm"
@@ -341,32 +341,32 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
   return (
     <div className="flex h-full">
       {/* Main Leads List */}
-      <div className={`bg-white ${selectedLead ? 'w-1/2' : 'w-full'} transition-all duration-300`}>
+      <div className={`bg-white dark:bg-slate-900 ${selectedLead ? 'w-1/2' : 'w-full'} transition-all duration-300`}>
         {/* Header */}
-        <div className="border-b border-gray-100 px-6 py-4">
+        <div className="border-b border-slate-200 dark:border-slate-700 px-6 py-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-800">
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
               Leads with Responses ({filteredLeads.length})
             </h2>
           </div>
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
             <Input
               placeholder="Search responding leads..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 border-0 bg-gray-50 focus:bg-white transition-colors"
+              className="pl-10 border-0 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-800 dark:text-slate-100 transition-colors"
             />
           </div>
         </div>
 
         {/* Leads List */}
-        <div className="divide-y divide-gray-100 overflow-y-auto">
+        <div className="divide-y divide-slate-200 dark:divide-slate-700 overflow-y-auto">
           {filteredLeads.length === 0 ? (
             <div className="px-6 py-12 text-center">
-              <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500 text-sm">No responding leads found</p>
-              <p className="text-gray-400 text-xs mt-1">Only leads with responses are shown</p>
+              <MessageSquare className="w-12 h-12 mx-auto mb-4 text-slate-300 dark:text-slate-600" />
+              <p className="text-slate-500 dark:text-slate-400 text-sm">No responding leads found</p>
+              <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">Only leads with responses are shown</p>
             </div>
           ) : (
             <>
@@ -380,8 +380,8 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
               return (
                 <div
                   key={lead.id}
-                  className={`px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer ${
-                    selectedLead?.id === lead.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                  className={`px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer ${
+                    selectedLead?.id === lead.id ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-l-blue-500' : ''
                   }`}
                   onClick={() => handleLeadClick(lead)}
                 >
@@ -394,17 +394,17 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       {/* Name */}
-                      <div className="font-medium text-gray-900 text-sm truncate">
+                      <div className="font-medium text-slate-900 dark:text-slate-100 text-sm truncate">
                         {name}
                       </div>
                       
                       {/* Email */}
-                      <div className="text-gray-500 text-sm truncate">
+                      <div className="text-slate-500 dark:text-slate-400 text-sm truncate">
                         {lead.email}
                       </div>
                       
                       {/* Campaign */}
-                      <div className="text-gray-400 text-xs mt-1">
+                      <div className="text-slate-400 dark:text-slate-500 text-xs mt-1">
                         {lead.campaignName}
                       </div>
                     </div>
@@ -415,10 +415,10 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
                         <MessageSquare className="w-3 h-3" />
                         Responded
                       </div>
-                      <div className="text-gray-400 text-xs">
+                      <div className="text-slate-400 dark:text-slate-500 text-xs">
                         {lead.responseCount} responses
                       </div>
-                      <div className="text-gray-400 text-xs">
+                      <div className="text-slate-400 dark:text-slate-500 text-xs">
                         {new Date(lead.lastResponseDate).toLocaleDateString()}
                       </div>
                     </div>
@@ -429,12 +429,12 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
 
               {/* Load More Button */}
               {canLoadMore && (
-                <div className="px-6 py-4 border-t border-gray-100">
+                <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700">
                   <Button 
                     onClick={loadMoreLeads}
                     variant="outline"
                     size="sm"
-                    className="w-full"
+                    className="w-full border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700"
                   >
                     Load More ({filteredLeads.length - displayCount} remaining)
                   </Button>
@@ -447,29 +447,29 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
 
       {/* Right Sidebar - Email Thread */}
       {selectedLead && (
-        <div className="w-1/2 bg-white border-l border-gray-200 flex flex-col">
+        <div className="w-1/2 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 flex flex-col">
           {/* Sidebar Header */}
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-medium text-xs">
                 {(selectedLead.first_name?.[0] || selectedLead.email[0]).toUpperCase()}
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">
+                <h3 className="font-medium text-slate-900 dark:text-slate-100">
                   {selectedLead.first_name && selectedLead.last_name 
                     ? `${selectedLead.first_name} ${selectedLead.last_name}`
                     : selectedLead.email.split('@')[0]
                   }
                 </h3>
-                <p className="text-sm text-gray-500">{selectedLead.email}</p>
-                <p className="text-xs text-green-600">Conversation Thread</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{selectedLead.email}</p>
+                <p className="text-xs text-green-600 dark:text-green-400">Conversation Thread</p>
               </div>
             </div>
             <button
               onClick={closeSidebar}
-              className="p-1 hover:bg-gray-100 rounded"
+              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-4 h-4 text-slate-500 dark:text-slate-400" />
             </button>
           </div>
 
@@ -482,14 +482,14 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
             ) : emailThread.length === 0 ? (
               <div className="flex items-center justify-center p-12">
                 <div className="text-center">
-                  <Mail className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                  <p className="text-gray-500">No conversation found</p>
+                  <Mail className="w-12 h-12 mx-auto mb-4 text-slate-300 dark:text-slate-600" />
+                  <p className="text-slate-500 dark:text-slate-400">No conversation found</p>
                 </div>
               </div>
             ) : (
               <div className="p-6 space-y-4">
                 {emailThread.map((email, index) => (
-                  <div key={email.id} className="border border-gray-200 rounded-lg p-4">
+                  <div key={email.id} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 bg-white dark:bg-slate-800">
                     {/* Email Header */}
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
@@ -499,7 +499,7 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
                           email.ue_type === 3 ? 'bg-orange-500' : // Sent manually
                           'bg-gray-400' // Other
                         }`} />
-                        <span className="text-xs font-medium text-gray-600">
+                        <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
                           {email.ue_type === 1 ? 'Campaign Email' :
                            email.ue_type === 2 ? 'Reply Received' :
                            email.ue_type === 3 ? 'Sent Email' :
@@ -521,7 +521,7 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-gray-500 flex items-center gap-1">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {new Date(email.timestamp_email).toLocaleDateString()}
                       </div>
@@ -529,23 +529,23 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
 
                     {/* Email Subject */}
                     <div className="mb-2">
-                      <h4 className="font-medium text-gray-900 text-sm">{email.subject}</h4>
+                      <h4 className="font-medium text-slate-900 dark:text-slate-100 text-sm">{email.subject}</h4>
                     </div>
 
                     {/* Email Addresses */}
                     <div className="space-y-1 mb-3 text-xs">
                       <div className="flex gap-2">
-                        <span className="text-gray-500">From:</span>
-                        <span className="text-gray-900">{email.from_address_email}</span>
+                        <span className="text-slate-500 dark:text-slate-400">From:</span>
+                        <span className="text-slate-900 dark:text-slate-100">{email.from_address_email}</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="text-gray-500">To:</span>
-                        <span className="text-gray-900">{email.to_address_email_list}</span>
+                        <span className="text-slate-500 dark:text-slate-400">To:</span>
+                        <span className="text-slate-900 dark:text-slate-100">{email.to_address_email_list}</span>
                       </div>
                     </div>
 
                     {/* Email Content */}
-                    <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded border max-h-48 overflow-y-auto whitespace-pre-wrap">
+                    <div className="text-sm text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-700 p-3 rounded border border-slate-200 dark:border-slate-600 max-h-48 overflow-y-auto whitespace-pre-wrap">
                       {formatEmailContent(email.body?.text || email.body?.html)}
                     </div>
                   </div>
