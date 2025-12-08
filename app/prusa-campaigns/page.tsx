@@ -31,11 +31,14 @@ export default function PrusaCampaignsPage() {
     console.error('Error parsing stored user:', e)
   }
   
-  // Check for both possible admin emails
-  const isEmergencyAdmin = storedUserData && (
+  // Check for both possible admin emails (localStorage + Firebase)
+  const isEmergencyAdmin = (storedUserData && (
     storedUserData.email === 'adimahna@gmail.com' || 
     storedUserData.email === 'adimstuff@gmail.com'
-  )
+  )) || (user && (
+    user.email === 'adimahna@gmail.com' || 
+    user.email === 'adimstuff@gmail.com'
+  ))
   
   console.log('🚨 EMERGENCY ADMIN CHECK (PRUSA):', { 
     isEmergencyAdmin, 
@@ -120,7 +123,8 @@ export default function PrusaCampaignsPage() {
         }
         
         // For admin users, set permissions directly without API call
-        if (isAdminAuth && (email === 'adimahna@gmail.com' || email === 'adimstuff@gmail.com')) {
+        if ((isAdminAuth && (email === 'adimahna@gmail.com' || email === 'adimstuff@gmail.com')) || 
+            (user && (user.email === 'adimahna@gmail.com' || user.email === 'adimstuff@gmail.com'))) {
           console.log('✅ ADMIN BYPASS: Setting admin permissions directly for prusa-campaigns')
           setUserPermissions({
             isAdmin: true,
