@@ -509,10 +509,10 @@ export function UnifiedCampaignsDashboard({
             {/* Metrics Cards */}
             <div className="grid grid-cols-5 gap-6 mb-8">
               {/* Sourced */}
-              <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
+              <Card className="p-6 bg-blue-50/30 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/30 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <Users className="w-5 h-5 text-slate-600 dark:text-slate-300" />
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Sourced</span>
+                  <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Sourced</span>
                 </div>
                 <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                   {validatedTotals.leads_count.toLocaleString()}
@@ -523,10 +523,10 @@ export function UnifiedCampaignsDashboard({
               </Card>
 
               {/* Emails Sent */}
-              <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
+              <Card className="p-6 bg-indigo-50/30 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800/30 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <Mail className="w-5 h-5 text-slate-600 dark:text-slate-300" />
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Emails Sent</span>
+                  <Mail className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">Emails Sent</span>
                 </div>
                 <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                   {validatedTotals.emails_sent_count.toLocaleString()}
@@ -534,10 +534,10 @@ export function UnifiedCampaignsDashboard({
               </Card>
 
               {/* Replies */}
-              <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
+              <Card className="p-6 bg-green-50/30 dark:bg-green-900/10 border-green-200 dark:border-green-800/30 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <TrendingUp className="w-5 h-5 text-slate-600 dark:text-slate-300" />
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Replies</span>
+                  <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  <span className="text-sm font-medium text-green-700 dark:text-green-300">Replies</span>
                 </div>
                 <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                   {validatedTotals.reply_count.toLocaleString()}
@@ -548,10 +548,10 @@ export function UnifiedCampaignsDashboard({
               </Card>
 
               {/* Opens */}
-              <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
+              <Card className="p-6 bg-purple-50/30 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800/30 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <Mail className="w-5 h-5 text-slate-600 dark:text-slate-300" />
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Opens</span>
+                  <Mail className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Opens</span>
                 </div>
                 <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                   {validatedTotals.open_count.toLocaleString()}
@@ -559,10 +559,10 @@ export function UnifiedCampaignsDashboard({
               </Card>
 
               {/* Opportunities */}
-              <Card className="p-6 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
+              <Card className="p-6 bg-amber-50/30 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/30 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <Calendar className="w-5 h-5 text-slate-600" />
-                  <span className="text-sm font-medium text-slate-600">Opportunities</span>
+                  <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Opportunities</span>
                 </div>
                 <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">
                   {validatedTotals.total_opportunities.toLocaleString()}
