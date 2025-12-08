@@ -197,7 +197,7 @@ export default function PrusaCampaignsPage() {
   if (isEmergencyAdmin) {
     console.log('🚨 EMERGENCY ADMIN RENDER BYPASS (PRUSA)')
     return (
-      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+      <div className="flex min-h-screen bg-black">
         <Sidebar />
         <div className="flex-1">
           <DashboardHeader />
@@ -211,7 +211,7 @@ export default function PrusaCampaignsPage() {
 
   if ((loading && !isAdminAuth && !isRegularUserAuth) || permissionLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-slate-500 mx-auto mb-4" />
           <p className="text-slate-600">Loading PRUSA campaigns...</p>
@@ -229,7 +229,7 @@ export default function PrusaCampaignsPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+      <div className="min-h-screen bg-black">
         {/* Simple header for regular users */}
         <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 shadow-sm">
           <div className="flex items-center justify-between">
@@ -270,7 +270,7 @@ export default function PrusaCampaignsPage() {
 
   // Admin layout with sidebar
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+    <div className="flex min-h-screen bg-black">
       <Sidebar />
 
       <div className="flex-1">
