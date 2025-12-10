@@ -113,18 +113,12 @@ export default function DashboardPage() {
         return (
           <div className="p-6 space-y-6">
             <div className="bg-white rounded-lg border p-6 space-y-4">
-              <h2 className="text-2xl font-bold text-gray-900 border-b pb-2">Medical Consultation Summary</h2>
+              <h2 className="text-2xl font-bold text-gray-900 border-b pb-2 blur-sm select-none bg-gray-100 px-2 py-1 rounded">Patient Care Documentation</h2>
               
-              <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                <div><span className="font-semibold text-gray-700">Date:</span> <span className="text-gray-900">Sample Date</span></div>
-                <div><span className="font-semibold text-gray-700">Duration:</span> <span className="text-gray-900">Sample Duration</span></div>
-                <div><span className="font-semibold text-gray-700">Provider:</span> <span className="text-gray-900">Sample Provider</span></div>
-                <div><span className="font-semibold text-gray-700">Patient:</span> <span className="text-gray-900">Sample Patient</span></div>
-              </div>
 
               <div className="space-y-4">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2 bg-red-50 p-2 rounded">Chief Complaint</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2 bg-red-50 p-2 rounded">Primary Concerns</h3>
                   <ul className="space-y-1 pl-4">
                     <li className="text-gray-700">• Sample presenting complaint for <span className="font-semibold">demonstration purposes</span></li>
                     <li className="text-gray-700">• <span className="blur-sm bg-gray-100 px-1 rounded select-none">Sample symptom progression details</span></li>
@@ -134,7 +128,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2 bg-green-50 p-2 rounded">Assessment & Plan</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2 bg-green-50 p-2 rounded">Evaluation & Strategy</h3>
                   <ul className="space-y-1 pl-4">
                     <li className="text-gray-700">• Sample comprehensive history taking for demo</li>
                     <li className="text-gray-700">• Clinical presentation consistent with <span className="font-semibold blur-sm bg-gray-100 px-1 rounded select-none">sample diagnosis for demonstration</span></li>
@@ -145,7 +139,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2 bg-blue-50 p-2 rounded">Clinical Observations</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2 bg-blue-50 p-2 rounded blur-sm select-none bg-gray-100 px-1 rounded">Professional Insights</h3>
                   <ul className="space-y-1 pl-4">
                     <li className="text-gray-700">• <span className="font-semibold text-blue-700">Sample empathetic approach</span> to patient concerns</li>
                     <li className="text-gray-700">• <span className="font-semibold text-green-700 blur-sm bg-gray-100 px-1 rounded select-none">Sample systematic methodology</span> for demonstration</li>
@@ -155,7 +149,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2 bg-yellow-50 p-2 rounded">Treatment Plan</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2 bg-yellow-50 p-2 rounded">Care Management</h3>
                   <div className="bg-gray-100 p-4 rounded space-y-2">
                     <div><span className="font-semibold text-gray-700">Sample Treatment Category:</span> <span className="text-gray-900 blur-sm bg-gray-100 px-1 rounded select-none">Sample specific recommendations blurred</span></div>
                     <div><span className="font-semibold text-gray-700">Sample Management:</span> <span className="text-green-600 font-semibold">Sample techniques for demonstration</span></div>
@@ -165,7 +159,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2 bg-purple-50 p-2 rounded">Follow-up Plan</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2 bg-purple-50 p-2 rounded">Continuity Planning</h3>
                   <ul className="space-y-1 pl-4">
                     <li className="text-gray-700">• Return appointment in <span className="font-semibold text-purple-700">sample timeframe</span></li>
                     <li className="text-gray-700">• <span className="blur-sm bg-gray-100 px-1 rounded select-none">Sample review process details blurred</span></li>
@@ -182,43 +176,30 @@ export default function DashboardPage() {
         return (
           <div className="p-6 space-y-6">
             {/* Audio Player */}
-            <div className="bg-white rounded-lg border p-4 shadow-sm">
-              <div className="flex items-center space-x-4">
+            <div className="bg-white rounded-lg border p-3">
+              <div className="flex items-center space-x-3">
                 <Button
                   onClick={togglePlayPause}
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
-                  className="w-12 h-12 rounded-full p-0 flex items-center justify-center"
+                  className="w-8 h-8 rounded-full p-0 flex items-center justify-center hover:bg-gray-100"
                 >
-                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-1" />}
+                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                 </Button>
                 
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <span>Medical Consultation - October 20, 2025</span>
-                    <span className="font-mono">{formatTime(currentTime)} / {formatTime(duration)}</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="flex-1">
+                  <div className="w-full bg-gray-200 rounded-full h-1">
                     <div 
-                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                      className="bg-gray-800 h-1 rounded-full transition-all duration-300"
                       style={{ width: `${(currentTime / duration) * 100}%` }}
                     ></div>
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm">
-                    <SkipBack className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Volume2 className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <SkipForward className="w-4 h-4" />
-                  </Button>
-                </div>
+                <span className="text-xs text-gray-500 font-mono min-w-[60px] text-right">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </span>
               </div>
-              
             </div>
 
             {/* Transcript Content */}
@@ -290,7 +271,7 @@ export default function DashboardPage() {
         return (
           <div className="p-6 space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">Tracking Analysis</h2>
+              <h2 className="text-xl font-semibold text-gray-900 blur-sm select-none bg-gray-100 px-2 py-1 rounded">Tracking Analysis</h2>
               <Button
                 variant="outline"
                 size="sm"
@@ -304,7 +285,7 @@ export default function DashboardPage() {
               {/* Highlighted Transcript */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Transcript with Tracking</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 blur-sm select-none bg-gray-100 px-2 py-1 rounded">Transcript with Tracking</h3>
                   <div className="text-sm text-gray-500">
                     {sampleInsights.trackerByPhrases.length} tracked phrases found
                   </div>
@@ -462,7 +443,7 @@ export default function DashboardPage() {
           <div className="border-b border-border p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{transcriptName}</h1>
+                <h1 className="text-2xl font-bold text-gray-900 blur-sm select-none bg-gray-100 px-2 py-1 rounded">{transcriptName}</h1>
                 <p className="text-gray-600">{personName} • Example Consultation</p>
               </div>
               <div className="text-sm text-gray-500">
