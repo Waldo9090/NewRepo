@@ -147,27 +147,30 @@ export async function GET(request: NextRequest) {
       campaignsToSearch = campaignsToSearch.filter(campaign => campaign.campaignId === campaignId)
     }
 
-    // Limit campaigns for "all" category to improve performance
-    if (category === 'all' && campaignsToSearch.length > 10) {
-      campaignsToSearch = campaignsToSearch.slice(0, 10) // Only process first 10 campaigns for "all"
-      console.log(`Limited to first 10 campaigns for performance when category=all`)
+    // Limit campaigns for all categories to avoid rate limits
+    if (campaignsToSearch.length > 5) {
+      campaignsToSearch = campaignsToSearch.slice(0, 5) // Only process first 5 campaigns to avoid rate limits
+      console.log(`Limited to first 5 campaigns to avoid rate limits`)
     }
 
     // Helper function to add delay between requests
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-    // Helper function to retry API calls with exponential backoff - optimized for speed
+    // Helper function to retry API calls with exponential backoff - improved for rate limits
     async function retryWithBackoff<T>(
       fn: () => Promise<T>,
-      maxRetries: number = 2, // Reduced from 3 to 2
-      baseDelay: number = 300  // Reduced from 1000ms to 300ms
+      maxRetries: number = 3,
+      baseDelay: number = 1000  // Increased base delay for rate limits
     ): Promise<T> {
       let lastError: Error | null = null
       
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
           if (attempt > 0) {
-            const delayMs = baseDelay * Math.pow(2, attempt - 1)
+            // For rate limit errors, use longer delays
+            const isRateLimit = lastError?.message.includes('Rate limit exceeded')
+            const delayMultiplier = isRateLimit ? 5 : 2 // 5x longer for rate limits
+            const delayMs = baseDelay * Math.pow(delayMultiplier, attempt - 1)
             console.log(`Retrying in ${delayMs}ms (attempt ${attempt + 1}/${maxRetries + 1})`)
             await delay(delayMs)
           }
@@ -194,6 +197,8 @@ export async function GET(request: NextRequest) {
 
     // Process campaigns sequentially to avoid overwhelming the API
     const allEmails = []
+    let rateLimitHits = 0
+    const maxRateLimitHits = 2 // Stop after 2 rate limit hits
     
     for (let index = 0; index < campaignsToSearch.length; index++) {
       const campaign = campaignsToSearch[index]
@@ -204,9 +209,9 @@ export async function GET(request: NextRequest) {
         continue
       }
 
-      // Reduced delay for faster responses - only add delay for large batches
-      if (index > 0 && index % 5 === 0) {
-        await delay(500) // Only 500ms delay every 5 requests
+      // Add delay between all requests to avoid rate limits
+      if (index > 0) {
+        await delay(1000) // 1 second delay between each request
       }
 
       try {
@@ -220,8 +225,8 @@ export async function GET(request: NextRequest) {
         
         // Build query parameters for emails API
         const params = new URLSearchParams()
-        // Reduce limit for "all" category to improve performance
-        const emailLimit = category === 'all' ? '30' : '100'
+        // Reduce limit to avoid rate limits
+        const emailLimit = '50' // Reduced limit for all categories
         params.append('limit', emailLimit)
         params.append('campaign_id', campaign.campaignId)
         params.append('sort_order', 'desc') // Most recent first
@@ -316,6 +321,20 @@ export async function GET(request: NextRequest) {
         allEmails.push(...emails)
       } catch (error) {
         console.warn(`Error fetching emails for campaign ${campaign.campaignId}:`, error)
+        
+        // If we hit rate limits, increment counter and potentially break
+        if (error instanceof Error && error.message.includes('Rate limit exceeded')) {
+          rateLimitHits++
+          console.warn(`Rate limit hit ${rateLimitHits}/${maxRateLimitHits}`)
+          
+          if (rateLimitHits >= maxRateLimitHits) {
+            console.warn(`Too many rate limits hit, stopping further campaign processing`)
+            break
+          }
+          
+          // Add extra delay after rate limit
+          await delay(5000) // 5 second delay after rate limit
+        }
       }
     }
 
