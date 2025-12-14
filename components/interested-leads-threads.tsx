@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Loader2, Search, X, Mail, Clock, User, MessageSquare, ArrowRight } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Loader2, Search, X, Mail, Clock, User, MessageSquare, ArrowRight, Filter } from "lucide-react"
 
 interface InterestedLead {
   id: string
@@ -57,6 +58,15 @@ function formatEmailContent(content: string | undefined | null): string {
   return formatted
 }
 
+const INTEREST_FILTERS = [
+  { id: 'all', label: 'All Responses', value: null },
+  { id: 'interested', label: 'Interested', value: 1 },
+  { id: 'neutral', label: 'Neutral', value: 0 },
+  { id: 'not-interested', label: 'Not Interested', value: -1 },
+  { id: 'out-of-office', label: 'Out of Office', value: -2 },
+  { id: 'bounced', label: 'Bounced', value: -3 }
+]
+
 export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps) {
   const [leads, setLeads] = useState<InterestedLead[]>([])
   const [loading, setLoading] = useState(true)
@@ -65,6 +75,7 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
   const [emailThread, setEmailThread] = useState<EmailThread[]>([])
   const [threadLoading, setThreadLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedInterestFilter, setSelectedInterestFilter] = useState<string>('all')
   
   // Pagination for better performance
   const [displayCount, setDisplayCount] = useState(25)
@@ -296,14 +307,21 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
     setEmailThread([])
   }
 
-  // Filter leads based on search
-  const filteredLeads = leads.filter(lead => 
-    !searchTerm || 
-    lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    lead.company_name?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  // Filter leads based on search and interest status
+  const filteredLeads = leads.filter(lead => {
+    // Search filter
+    const matchesSearch = !searchTerm || 
+      lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.company_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    // Interest status filter
+    const selectedFilter = INTEREST_FILTERS.find(f => f.id === selectedInterestFilter)
+    const matchesInterest = selectedFilter?.value === null || lead.interestStatus === selectedFilter.value
+    
+    return matchesSearch && matchesInterest
+  })
 
   // Paginate filtered leads for better performance
   const paginatedLeads = filteredLeads.slice(0, displayCount)
@@ -349,14 +367,35 @@ export function InterestedLeadsThreads({ category }: InterestedLeadsThreadsProps
               Leads with Responses ({filteredLeads.length})
             </h2>
           </div>
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
-            <Input
-              placeholder="Search responding leads..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 border-0 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-800 dark:text-slate-100 transition-colors"
-            />
+          
+          {/* Search and Filters Row */}
+          <div className="flex items-center gap-4">
+            {/* Search Bar */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+              <Input
+                placeholder="Search responding leads..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 border-0 bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 text-slate-800 dark:text-slate-100 transition-colors"
+              />
+            </div>
+            
+            {/* Interest Status Filter Dropdown */}
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+              <select
+                value={selectedInterestFilter}
+                onChange={(e) => setSelectedInterestFilter(e.target.value)}
+                className="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-[140px]"
+              >
+                {INTEREST_FILTERS.map((filter) => (
+                  <option key={filter.id} value={filter.id}>
+                    {filter.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 

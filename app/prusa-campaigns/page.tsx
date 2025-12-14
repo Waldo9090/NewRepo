@@ -201,7 +201,7 @@ export default function PrusaCampaignsPage() {
   if (isEmergencyAdmin) {
     console.log('🚨 EMERGENCY ADMIN RENDER BYPASS (PRUSA)')
     return (
-      <div className="flex min-h-screen bg-black">
+      <div className="flex min-h-screen bg-white dark:bg-slate-950">
         <Sidebar />
         <div className="flex-1">
           <DashboardHeader />
@@ -215,10 +215,10 @@ export default function PrusaCampaignsPage() {
 
   if ((loading && !isAdminAuth && !isRegularUserAuth) || permissionLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-500 mx-auto mb-4" />
-          <p className="text-slate-600">Loading PRUSA campaigns...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-slate-500 dark:text-slate-400 mx-auto mb-4" />
+          <p className="text-slate-600 dark:text-slate-300">Loading PRUSA campaigns...</p>
         </div>
       </div>
     )
@@ -233,26 +233,26 @@ export default function PrusaCampaignsPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-white dark:bg-slate-950">
         {/* Simple header for regular users */}
-        <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 shadow-sm">
+        <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 px-6 py-4 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 text-sm">
               <div>
-                <div className="font-semibold text-xl text-slate-800 tracking-tight">
+                <div className="font-semibold text-xl text-slate-800 dark:text-slate-100 tracking-tight">
                   PRUSA Campaigns
                 </div>
-                <div className="text-xs text-slate-500">
+                <div className="text-xs text-slate-500 dark:text-slate-400">
                   Welcome, {isAdminAuth ? 'Admin User' : (isRegularUserAuth ? storedUserData?.displayName || storedUserData?.email : (user?.displayName || user?.email))}
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-sm text-slate-600">
+            <div className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
               <span>{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="rounded-xl hover:bg-red-100 text-slate-600 hover:text-red-600"
+                className="rounded-xl hover:bg-red-100 dark:hover:bg-red-900 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400"
                 onClick={() => {
                   localStorage.removeItem('user')
                   router.push('/signin')
@@ -274,7 +274,7 @@ export default function PrusaCampaignsPage() {
 
   // Admin layout with sidebar
   return (
-    <div className="flex min-h-screen bg-black">
+    <div className="flex min-h-screen bg-white dark:bg-slate-950">
       <Sidebar />
 
       <div className="flex-1">

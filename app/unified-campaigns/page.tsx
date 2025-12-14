@@ -5,8 +5,10 @@ import { UnifiedCampaignDashboard } from "@/components/unified-campaign-dashboar
 import { CampaignBreakdown } from "@/components/campaign-breakdown"
 import { CampaignMessages } from "@/components/campaign-messages"
 import { CampaignFilter } from "@/components/campaign-filter"
+import { InboxFilters } from "@/components/inbox-filters"
+import { InboxEmailList } from "@/components/inbox-email-list"
 import { Card } from "@/components/ui/card"
-import { Mail, BarChart3, TrendingUp } from "lucide-react"
+import { Mail, BarChart3, TrendingUp, Inbox } from "lucide-react"
 
 export default function UnifiedCampaignsPage() {
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'roger' | 'reachify' | 'prusa'>('all')
@@ -16,6 +18,7 @@ export default function UnifiedCampaignsPage() {
     startDate: '',
     endDate: ''
   })
+  const [inboxFilters, setInboxFilters] = useState<string[]>([])
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -102,6 +105,17 @@ export default function UnifiedCampaignsPage() {
             Campaign Breakdown
           </button>
           <button
+            onClick={() => setSelectedTab("inbox")}
+            className={`flex items-center gap-3 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+              selectedTab === "inbox"
+                ? "bg-white dark:bg-slate-800 shadow-md border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100"
+                : "text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-800/50"
+            }`}
+          >
+            <Inbox className="w-4 h-4" />
+            Inbox
+          </button>
+          <button
             onClick={() => setSelectedTab("messages")}
             className={`flex items-center gap-3 px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
               selectedTab === "messages"
@@ -115,6 +129,27 @@ export default function UnifiedCampaignsPage() {
         </div>
 
         {/* Content Sections */}
+        {selectedTab === "inbox" && (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Inbox Filters */}
+            <div className="lg:col-span-1">
+              <InboxFilters
+                selectedFilters={inboxFilters}
+                onFiltersChange={setInboxFilters}
+              />
+            </div>
+            
+            {/* Inbox Content */}
+            <div className="lg:col-span-3">
+              <InboxEmailList
+                selectedFilters={inboxFilters}
+                campaignId={selectedCampaignId}
+                workspaceId={null}
+              />
+            </div>
+          </div>
+        )}
+
         {selectedTab === "overview" && (
           <UnifiedCampaignDashboard 
             category={selectedCategory}

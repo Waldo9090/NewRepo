@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Loader2, Mail, Clock, Copy, Eye, EyeOff } from "lucide-react"
+import { InboxFilters } from "@/components/inbox-filters"
+import { InboxEmailList } from "@/components/inbox-email-list"
+import { Loader2, Mail, Clock, Copy, Eye, EyeOff, Inbox, MessageSquare } from "lucide-react"
 
 interface CampaignStep {
   type: string
@@ -39,6 +41,8 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
   const [error, setError] = useState<string | null>(null)
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set())
   const [copiedVariant, setCopiedVariant] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<'inbox' | 'sequences'>('inbox')
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([])
 
   const toggleStepExpansion = (stepId: string) => {
     const newExpanded = new Set(expandedSteps)
@@ -209,7 +213,7 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-100">{campaignData.name}</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">Email Sequence Messages</p>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">Campaign Management</p>
           </div>
           <Badge 
             variant={campaignData.status === 1 ? "default" : "secondary"}
@@ -218,14 +222,60 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
             {statusLabels[campaignData.status as keyof typeof statusLabels] || 'Unknown'}
           </Badge>
         </div>
-        <div className="text-sm text-slate-600 dark:text-slate-300">
-          <span className="font-medium">{sequence.steps.length}</span> email steps in sequence
+        
+        {/* Tabs */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveTab('inbox')}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+              activeTab === 'inbox'
+                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
+            }`}
+          >
+            <Inbox className="w-4 h-4" />
+            Inbox
+          </button>
+          <button
+            onClick={() => setActiveTab('sequences')}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+              activeTab === 'sequences'
+                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
+            }`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            Email Sequences
+            <Badge variant="secondary" className="ml-1 text-xs">
+              {sequence.steps.length}
+            </Badge>
+          </button>
         </div>
       </div>
 
-      {/* Email Steps */}
-      <div className="space-y-4">
-        {sequence.steps.map((step, stepIndex) => {
+      {/* Tab Content */}
+      {activeTab === 'inbox' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Inbox Filters */}
+          <div className="lg:col-span-1">
+            <InboxFilters
+              selectedFilters={selectedFilters}
+              onFiltersChange={setSelectedFilters}
+            />
+          </div>
+          
+          {/* Inbox Content */}
+          <div className="lg:col-span-3">
+            <InboxEmailList
+              selectedFilters={selectedFilters}
+              campaignId={campaignId}
+              workspaceId={workspaceId}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {sequence.steps.map((step, stepIndex) => {
           const stepId = `step-${stepIndex}`
           const isExpanded = expandedSteps.has(stepId)
           
@@ -338,16 +388,17 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
               </div>
             </Card>
           )
-        })}
-      </div>
+          })}
 
-      {sequence.steps.length === 0 && (
-        <div className="text-center py-12">
-          <Mail className="w-16 h-16 mx-auto mb-4 text-slate-300 dark:text-slate-600" />
-          <h3 className="text-lg font-medium text-slate-800 dark:text-slate-100 mb-2">No Email Steps</h3>
-          <p className="text-sm text-slate-600 dark:text-slate-300">
-            This campaign sequence doesn't have any email steps configured.
-          </p>
+          {sequence.steps.length === 0 && (
+            <div className="text-center py-12">
+              <Mail className="w-16 h-16 mx-auto mb-4 text-slate-300 dark:text-slate-600" />
+              <h3 className="text-lg font-medium text-slate-800 dark:text-slate-100 mb-2">No Email Steps</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                This campaign sequence doesn't have any email steps configured.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
