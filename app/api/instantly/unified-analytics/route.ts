@@ -93,8 +93,26 @@ export async function GET(request: NextRequest) {
         if (response.ok) {
           const data = await response.json()
           
-          // Add all campaigns from this workspace
-          const workspaceCampaigns = data.map((campaign: any) => ({
+          // Filter campaigns based on workspace category
+          let filteredData = data
+          if (workspace.category === 'prusa') {
+            // For PRUSA workspace, filter to specific allowed campaigns
+            const allowedPrusaCampaigns = [
+              'Candytrail Past Compass',
+              'PRUSA external company 7.9M+',
+              'PRUSA New Compass Leads',
+              'PRUSA Compass 7.9M+',
+              'PRUSA Target Company 7.9M+'
+            ]
+            
+            filteredData = data.filter((campaign: any) => 
+              allowedPrusaCampaigns.includes(campaign.campaign_name) ||
+              campaign.campaign_id === '43daa37e-1973-4e90-b8d5-5f218885e12d' // PRUSA New York
+            )
+          }
+          
+          // Add filtered campaigns from this workspace
+          const workspaceCampaigns = filteredData.map((campaign: any) => ({
             id: `${workspace.category}-${campaign.campaign_id}`,
             name: campaign.campaign_name,
             campaignId: campaign.campaign_id,

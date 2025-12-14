@@ -4,9 +4,7 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { InboxFilters } from "@/components/inbox-filters"
-import { InboxEmailList } from "@/components/inbox-email-list"
-import { Loader2, Mail, Clock, Copy, Eye, EyeOff, Inbox, MessageSquare } from "lucide-react"
+import { Loader2, Mail, Clock, Copy, Eye, EyeOff, MessageSquare } from "lucide-react"
 
 interface CampaignStep {
   type: string
@@ -41,8 +39,8 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
   const [error, setError] = useState<string | null>(null)
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set())
   const [copiedVariant, setCopiedVariant] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'inbox' | 'sequences'>('inbox')
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([])
+  const [activeTab] = useState<'sequences'>('sequences') // Kept for potential future use
+  const [selectedFilters] = useState<string[]>([]) // Kept for potential future use
 
   const toggleStepExpansion = (stepId: string) => {
     const newExpanded = new Set(expandedSteps)
@@ -223,38 +221,18 @@ export function CampaignMessages({ campaignName, campaignId, workspaceId }: Camp
           </Badge>
         </div>
         
-        {/* Tabs */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setActiveTab('inbox')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-              activeTab === 'inbox'
-                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
-            }`}
-          >
-            <Inbox className="w-4 h-4" />
-            Inbox
-          </button>
-          <button
-            onClick={() => setActiveTab('sequences')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-              activeTab === 'sequences'
-                ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700"
-                : "text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-slate-800/50"
-            }`}
-          >
-            <MessageSquare className="w-4 h-4" />
-            Email Sequences
-            <Badge variant="secondary" className="ml-1 text-xs">
-              {sequence.steps.length}
-            </Badge>
-          </button>
+        {/* Email Sequences Header - No Tabs */}
+        <div className="flex items-center gap-2">
+          <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <span className="text-lg font-semibold text-slate-800 dark:text-slate-100">Email Sequences</span>
+          <Badge variant="secondary" className="ml-2 text-xs">
+            {sequence.steps.length}
+          </Badge>
         </div>
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'inbox' ? (
+      {false ? (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Inbox Filters */}
           <div className="lg:col-span-1">

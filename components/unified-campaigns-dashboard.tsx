@@ -154,14 +154,36 @@ export function UnifiedCampaignsDashboard({
 
   // Load saved preferences
   const loadSavedPreferences = async () => {
+    // First try localStorage for immediate access
+    try {
+      const localStorageKey = `campaign-selections-${defaultCategory}`
+      const localSavedIds = localStorage.getItem(localStorageKey)
+      if (localSavedIds) {
+        const parsedIds = JSON.parse(localSavedIds)
+        console.log(`Loaded ${defaultCategory} campaign selections from localStorage:`, parsedIds)
+        return parsedIds
+      }
+    } catch (error) {
+      console.warn('Error loading from localStorage:', error)
+    }
+    
+    // Fallback to API preferences
     try {
       const response = await fetch('/api/admin/campaign-preferences')
       if (response.ok) {
         const preferences = await response.json()
-        return preferences[defaultCategory] || []
+        const apiSavedIds = preferences[defaultCategory] || []
+        
+        // Save to localStorage for future quick access
+        if (apiSavedIds.length > 0) {
+          localStorage.setItem(`campaign-selections-${defaultCategory}`, JSON.stringify(apiSavedIds))
+        }
+        
+        console.log(`Loaded ${defaultCategory} campaign selections from API:`, apiSavedIds)
+        return apiSavedIds
       }
     } catch (error) {
-      console.error('Error loading preferences:', error)
+      console.error('Error loading preferences from API:', error)
     }
     return []
   }
@@ -261,29 +283,64 @@ export function UnifiedCampaignsDashboard({
   }, [defaultCategory])
 
   const toggleCampaignSelection = (campaignId: string) => {
-    setCampaigns(prev => prev.map(campaign => 
-      campaign.id === campaignId 
-        ? { ...campaign, selected: !campaign.selected }
-        : campaign
-    ))
+    setCampaigns(prev => {
+      const updated = prev.map(campaign => 
+        campaign.id === campaignId 
+          ? { ...campaign, selected: !campaign.selected }
+          : campaign
+      )
+      
+      // Save to localStorage immediately for persistence
+      const selectedIds = updated.filter(c => c.selected).map(c => c.campaignId)
+      localStorage.setItem(`campaign-selections-${defaultCategory}`, JSON.stringify(selectedIds))
+      
+      return updated
+    })
     setHasUnsavedChanges(true)
   }
 
   const selectAllCampaigns = () => {
-    setCampaigns(prev => prev.map(campaign => ({ ...campaign, selected: true })))
+    setCampaigns(prev => {
+      const updated = prev.map(campaign => ({ ...campaign, selected: true }))
+      
+      // Save to localStorage
+      const selectedIds = updated.map(c => c.campaignId)
+      localStorage.setItem(`campaign-selections-${defaultCategory}`, JSON.stringify(selectedIds))
+      
+      return updated
+    })
     setHasUnsavedChanges(true)
   }
 
   const deselectAllCampaigns = () => {
-    setCampaigns(prev => prev.map(campaign => ({ ...campaign, selected: false })))
+    setCampaigns(prev => {
+      const updated = prev.map(campaign => ({ ...campaign, selected: false }))
+      
+      // Save to localStorage
+      localStorage.setItem(`campaign-selections-${defaultCategory}`, JSON.stringify([]))
+      
+      return updated
+    })
     setHasUnsavedChanges(true)
   }
 
   const selectCategoryOnly = (category: 'roger' | 'reachify' | 'prusa') => {
-    setCampaigns(prev => prev.map(campaign => ({ 
-      ...campaign, 
-      selected: campaign.category === category 
-    })))
+    setCampaigns(prev => {
+      const updated = prev.map(campaign => ({ 
+        ...campaign, 
+        selected: campaign.category === category 
+      }))
+      
+      // Save to localStorage immediately
+      const selectedIds = updated.filter(c => c.selected).map(c => c.id)
+      try {
+        localStorage.setItem(`campaign-selections-${defaultCategory}`, JSON.stringify(selectedIds))
+      } catch (error) {
+        console.warn('Failed to save to localStorage:', error)
+      }
+      
+      return updated
+    })
     setHasUnsavedChanges(true)
   }
 
